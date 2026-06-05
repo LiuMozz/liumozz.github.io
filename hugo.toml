@@ -1,0 +1,90 @@
+baseURL = 'https://liumozz.github.io/'
+locale = 'zh-cn'
+defaultContentLanguage = 'zh'
+title = "LiuMozz's Blog"
+theme = 'PaperMod'
+
+# Enable emoji support globally
+enableEmoji = true
+
+# Word count and reading time configuration
+ShowReadingTime = true
+ShowWordCount = true
+
+# Pagination
+paginate = 5
+
+[params]
+    env = 'production'
+    title = "LiuMozz's Blog"
+    description = "Welcome to my personal blog where I share my notes and thoughts on development, technology, and life."
+    author = "LiuMozz"
+    
+    # Theme configuration
+    defaultTheme = 'auto' # auto, dark, light
+    disableThemeToggle = false
+    
+    # Card / layout configurations
+    ShowBreadCrumbs = true
+    ShowShareButtons = true
+    ShowPostNavLinks = true
+    ShowCodeCopyButtons = true
+    ShowToc = true
+    UseHugoToc = true
+    
+    # Profile Mode (Hero section on index page)
+    [params.profileMode]
+        enabled = true
+        title = "LiuMozz's Blog"
+        subtitle = "💻 Developer | 📖 Life-long Learner | ✍️ Writing my thoughts"
+        imageUrl = "" # Can be updated with a local avatar path or url
+        imageWidth = 120
+        imageHeight = 120
+        imageTitle = "Avatar"
+        
+        [[params.profileMode.buttons]]
+            name = "📝 文章"
+            url = "posts"
+            
+        [[params.profileMode.buttons]]
+            name = "🏷️ 标签"
+            url = "tags"
+            
+    # Social icons on profile page
+    [[params.socialIcons]]
+        name = "github"
+        url = "https://github.com/LiuMozz"
+        
+    [[params.socialIcons]]
+        name = "email"
+        url = "mailto:liumozz@example.com"
+
+[menu]
+    # Main navigation menu
+    [[menu.main]]
+        identifier = "posts"
+        name = "文章"
+        url = "/posts/"
+        weight = 10
+        
+    [[menu.main]]
+        identifier = "tags"
+        name = "标签"
+        url = "/tags/"
+        weight = 20
+        
+    [[menu.main]]
+        identifier = "archives"
+        name = "归档"
+        url = "/archives/"
+        weight = 30
+        
+    [[menu.main]]
+        identifier = "search"
+        name = "搜索"
+        url = "/search/"
+        weight = 40
+
+# Add search capability to PaperMod (generates site index JSON)
+[outputs]
+    home = ["HTML", "RSS", "JSON"]
