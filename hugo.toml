@@ -1,7 +1,7 @@
 baseURL = 'https://liumozz.github.io/'
 locale = 'zh-cn'
 defaultContentLanguage = 'zh'
-title = "LiuMozz's Blog"
+title = "猛男妙妙屋"
 theme = 'PaperMod'
 
 # Enable emoji support globally
@@ -16,8 +16,8 @@ paginate = 5
 
 [params]
     env = 'production'
-    title = "LiuMozz's Blog"
-    description = "Welcome to my personal blog where I share my notes and thoughts on development, technology, and life."
+    title = "猛男妙妙屋"
+    description = "欢迎来到猛男妙妙屋！这里记录我的开发日常、技术学习笔记以及对生活的思考。"
     author = "LiuMozz"
     
     # Theme configuration
@@ -35,9 +35,9 @@ paginate = 5
     # Profile Mode (Hero section on index page)
     [params.profileMode]
         enabled = true
-        title = "LiuMozz's Blog"
-        subtitle = "💻 Developer | 📖 Life-long Learner | ✍️ Writing my thoughts"
-        imageUrl = "" # Can be updated with a local avatar path or url
+        title = "猛男妙妙屋"
+        subtitle = "💻 开发者 | 🏋️ 欢迎来到猛男妙妙屋 | ✍️ 记录技术与生活"
+        imageUrl = "https://github.com/LiuMozz.png" # Can be updated with a local avatar path or url
         imageWidth = 120
         imageHeight = 120
         imageTitle = "Avatar"
@@ -57,7 +57,7 @@ paginate = 5
         
     [[params.socialIcons]]
         name = "email"
-        url = "mailto:liumozz@example.com"
+        url = "mailto:liurushwhite@gmail.com"
 
 [menu]
     # Main navigation menu
