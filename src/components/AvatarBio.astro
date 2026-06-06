@@ -1,0 +1,278 @@
+---
+interface Props {
+  title?: string;
+  subtitle?: string;
+  avatarUrl?: string;
+  description?: string;
+}
+
+const {
+  title = "猛男妙妙屋",
+  subtitle = "💻 开发者 | 🏋️ 欢迎来到猛男妙妙屋 | ✍️ 记录技术与生活",
+  avatarUrl = "https://github.com/LiuMozz.png",
+  description = "欢迎来到猛男妙妙屋！这里记录我的开发日常、技术学习笔记以及对生活的思考。"
+} = Astro.props;
+
+const milestones = [
+  { year: "2026", text: "项目全面重构为 Astro，搭建霓虹毛玻璃微动效交互系统" },
+  { year: "2024", text: "深耕全栈工程实践，热衷前沿动效与多媒体互动组件开发" },
+  { year: "2022", text: "开启技术博客之旅，记录每一次代码调试与架构演进心得" }
+];
+---
+
+<div class="bio-container glass" id="bio-container">
+  <div class="avatar-wrapper">
+    <div class="avatar-circle">
+      <img src={avatarUrl} alt="Avatar" class="avatar-img" />
+      <div class="glow-ring"></div>
+    </div>
+    <div class="avatar-indicator">点击或悬停以探索 ⚡</div>
+  </div>
+  
+  <div class="info-panel">
+    <div class="info-content">
+      <h2 class="bio-title text-gradient-cyan">{title}</h2>
+      <p class="bio-subtitle">{subtitle}</p>
+      <p class="bio-desc">{description}</p>
+      
+      <div class="timeline">
+        <h3 class="timeline-header">🎯 经历里程碑</h3>
+        <div class="timeline-items">
+          {milestones.map((item, index) => (
+            <div class="timeline-item" style={`--delay: ${index * 0.1}s`}>
+              <span class="timeline-year">{item.year}</span>
+              <span class="timeline-text">{item.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .bio-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem;
+    max-width: 900px;
+    width: 100%;
+    margin: 2rem auto;
+    overflow: hidden;
+    cursor: pointer;
+    border-color: hsla(var(--border-glass));
+    transition: var(--transition-smooth);
+  }
+
+  /* When active: expands flex layout */
+  .bio-container.active {
+    border-color: hsla(var(--neon-cyan), 0.4);
+    box-shadow: 0 0 30px -5px hsla(var(--neon-cyan), 0.25);
+  }
+
+  .avatar-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+    transition: var(--transition-smooth);
+    width: 250px;
+  }
+
+  .bio-container.active .avatar-wrapper {
+    transform: scale(0.9) translateX(-15px);
+    width: 200px;
+  }
+
+  .avatar-circle {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    padding: 4px;
+    background: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--neon-purple)));
+    box-shadow: 0 0 20px hsla(var(--neon-cyan), 0.3);
+    transition: var(--transition-smooth);
+  }
+
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid hsl(var(--bg-color));
+  }
+
+  .glow-ring {
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--neon-purple))) border-box;
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0.5;
+    animation: spin 10s linear infinite;
+  }
+
+  .avatar-indicator {
+    font-size: 0.85rem;
+    color: hsl(var(--text-muted));
+    transition: var(--transition-smooth);
+    border: 1px solid hsla(var(--border-glass));
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .bio-container.active .avatar-indicator {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px);
+  }
+
+  /* Info Panel (collapsible side) */
+  .info-panel {
+    max-width: 0px;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-width 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bio-container.active .info-panel {
+    max-width: 600px;
+    opacity: 1;
+    padding-left: 2rem;
+  }
+
+  .info-content {
+    min-width: 320px;
+  }
+
+  .bio-title {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .bio-subtitle {
+    font-size: 0.95rem;
+    color: hsl(var(--neon-cyan));
+    margin-bottom: 1rem;
+    font-weight: 500;
+  }
+
+  .bio-desc {
+    font-size: 0.95rem;
+    color: hsl(var(--text-secondary));
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Timeline */
+  .timeline {
+    border-top: 1px solid hsla(var(--border-glass));
+    padding-top: 1.2rem;
+  }
+
+  .timeline-header {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+  }
+
+  .timeline-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    transition-delay: var(--delay);
+  }
+
+  .bio-container.active .timeline-item {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .timeline-year {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: hsl(var(--neon-purple));
+    background: hsla(var(--neon-purple), 0.15);
+    border: 1px solid hsla(var(--neon-purple), 0.3);
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+    text-shadow: 0 0 5px hsla(var(--neon-purple), 0.3);
+  }
+
+  .timeline-text {
+    font-size: 0.9rem;
+    color: hsl(var(--text-secondary));
+    line-height: 1.5;
+  }
+
+  /* Mobile Adjustments */
+  @media (max-width: 640px) {
+    .bio-container {
+      flex-direction: column;
+      padding: 1.5rem;
+      gap: 1.5rem;
+    }
+
+    .avatar-wrapper {
+      width: 100%;
+    }
+
+    .bio-container.active .avatar-wrapper {
+      width: 100%;
+      transform: scale(0.9) translateY(-10px);
+    }
+
+    .bio-container.active .info-panel {
+      padding-left: 0;
+      padding-top: 1rem;
+      border-top: 1px solid hsla(var(--border-glass));
+    }
+    
+    .info-content {
+      min-width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const bioContainer = document.getElementById('bio-container');
+  
+  if (bioContainer) {
+    // Click toggle
+    bioContainer.addEventListener('click', (e) => {
+      e.stopPropagation();
+      bioContainer.classList.toggle('active');
+    });
+
+    // Hover effect
+    bioContainer.addEventListener('mouseenter', () => {
+      bioContainer.classList.add('active');
+    });
+
+    bioContainer.addEventListener('mouseleave', () => {
+      bioContainer.classList.remove('active');
+    });
+  }
+</script>

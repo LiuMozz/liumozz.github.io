@@ -1,0 +1,357 @@
+---
+import BentoCard from './BentoCard.astro';
+---
+
+<div class="bento-grid">
+  <!-- Tech Blog Card -->
+  <BentoCard 
+    title="💻 技术博客" 
+    subtitle="记录我的开发日常、技术学习笔记以及对系统的深度思考" 
+    href="/posts" 
+    accent="cyan" 
+    class="card-tech"
+  >
+    <div class="terminal-mockup">
+      <div class="terminal-header">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="terminal-title">bash - blog.sh</span>
+      </div>
+      <div class="terminal-body">
+        <p class="term-line"><span class="term-prompt">$</span> cat welcome.txt</p>
+        <p class="term-output">Welcome to LiuMozz's space...</p>
+        <p class="term-line"><span class="term-prompt">$</span> npm run build</p>
+        <p class="term-output success">✓ Astro build completed in 241ms</p>
+      </div>
+    </div>
+  </BentoCard>
+
+  <!-- Music Space Card (Vertical long) -->
+  <BentoCard 
+    title="🎵 音乐屋" 
+    subtitle="黑胶唱片律动，带上耳机，在音符里寻找片刻宁静" 
+    href="/music" 
+    accent="purple" 
+    class="card-music"
+  >
+    <div class="vinyl-mockup">
+      <div class="vinyl-record">
+        <div class="vinyl-label"></div>
+      </div>
+      <div class="vinyl-arm"></div>
+      <div class="music-wave">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </BentoCard>
+
+  <!-- Gaming Center Card -->
+  <BentoCard 
+    title="🎮 游戏空间" 
+    subtitle="主机、电竞与经典单机之旅" 
+    href="/gaming" 
+    accent="emerald" 
+    class="card-gaming"
+  >
+    <div class="gamepad-mockup">
+      <svg viewBox="0 0 24 24" width="70" height="70" stroke="currentColor" stroke-width="1.5" fill="none" class="gamepad-svg">
+        <rect x="2" y="6" width="20" height="12" rx="6" stroke="currentColor"></rect>
+        <path d="M6 12h4M8 10v4" stroke-linecap="round"></path>
+        <circle cx="15" cy="11" r="1" fill="currentColor"></circle>
+        <circle cx="17" cy="13" r="1" fill="currentColor"></circle>
+      </svg>
+      <div class="neon-grid-bg"></div>
+    </div>
+  </BentoCard>
+
+  <!-- Travel Log Card -->
+  <BentoCard 
+    title="✈️ 旅行见闻" 
+    subtitle="用镜头和文字记下看过的风景、走过的路" 
+    href="/travel" 
+    accent="orange" 
+    class="card-travel"
+  >
+    <div class="travel-mockup">
+      <div class="photo-frame">
+        <div class="photo-placeholder">
+          <svg viewBox="0 0 24 24" width="36" height="36" stroke="currentColor" stroke-width="1.5" fill="none">
+            <path d="M21 16V8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"></path>
+            <circle cx="9" cy="10" r="2"></circle>
+            <path d="m21 13-3-3a2.42 2.42 0 0 0-3.4 0L12 13l-3-3a2.42 2.42 0 0 0-3.4 0l-2.6 2.6"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="travel-deco">
+        <span class="badge">🎒 户外</span>
+        <span class="badge">📸 摄影</span>
+      </div>
+    </div>
+  </BentoCard>
+</div>
+
+<style>
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 240px;
+    gap: 1.5rem;
+    max-width: 1100px;
+    width: 100%;
+    margin: 2rem auto;
+  }
+
+  .card-tech {
+    grid-column: span 2;
+  }
+
+  .card-music {
+    grid-column: span 1;
+    grid-row: span 2;
+    height: 100%;
+  }
+
+  .card-gaming {
+    grid-column: span 1;
+  }
+
+  .card-travel {
+    grid-column: span 2;
+  }
+
+  /* Mockups styling */
+  
+  /* Tech Card terminal */
+  .terminal-mockup {
+    width: 100%;
+    background: #090a0f;
+    border: 1px solid hsla(var(--border-glass));
+    border-radius: var(--radius-sm);
+    padding: 0.8rem;
+    font-family: monospace;
+    font-size: 0.8rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  }
+
+  .terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 0.4rem;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .dot.red { background: #ff5f56; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #27c93f; }
+
+  .terminal-title {
+    color: hsl(var(--text-muted));
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .term-line {
+    color: #ffffff;
+    margin-bottom: 0.3rem;
+  }
+
+  .term-prompt {
+    color: hsl(var(--neon-cyan));
+  }
+
+  .term-output {
+    color: hsl(var(--text-secondary));
+    margin-bottom: 0.5rem;
+    padding-left: 0.5rem;
+  }
+
+  .term-output.success {
+    color: hsl(var(--neon-emerald));
+    text-shadow: 0 0 5px hsla(var(--neon-emerald), 0.3);
+  }
+
+  /* Music card vinyl */
+  .vinyl-mockup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .vinyl-record {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #222 20%, #050505 50%, #1a1a1a 80%, #0a0a0a 100%);
+    border: 3px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    position: relative;
+    animation: spin 12s linear infinite;
+  }
+
+  .vinyl-label {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 10%, hsl(var(--neon-purple)) 60%);
+    border: 2px solid #222;
+  }
+
+  .vinyl-arm {
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border-left: 3px solid #666;
+    border-top: 3px solid #666;
+    border-radius: 10px 0 0 0;
+    transform: rotate(20deg);
+    transform-origin: top right;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .vinyl-arm::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: -5px;
+    width: 12px;
+    height: 12px;
+    background: #888;
+    border-radius: 2px;
+    transform: rotate(-20deg);
+  }
+
+  .music-wave {
+    display: flex;
+    gap: 0.2rem;
+    height: 25px;
+    align-items: flex-end;
+    margin-top: 1.5rem;
+  }
+
+  .music-wave span {
+    width: 3px;
+    height: 100%;
+    background: hsl(var(--neon-purple));
+    border-radius: 3px;
+    animation: pulse-wave 1.2s ease-in-out infinite alternate;
+    transform-origin: bottom;
+  }
+
+  .music-wave span:nth-child(2) { animation-delay: 0.2s; }
+  .music-wave span:nth-child(3) { animation-delay: 0.4s; }
+  .music-wave span:nth-child(4) { animation-delay: 0.1s; }
+  .music-wave span:nth-child(5) { animation-delay: 0.3s; }
+
+  @keyframes pulse-wave {
+    0% { transform: scaleY(0.2); }
+    100% { transform: scaleY(1); }
+  }
+
+  /* Gaming card gamepad */
+  .gamepad-mockup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    height: 80px;
+    color: hsl(var(--neon-emerald));
+    filter: drop-shadow(0 0 10px hsla(var(--neon-emerald), 0.4));
+  }
+
+  /* Travel card photo frame */
+  .travel-mockup {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    height: 100%;
+  }
+
+  .photo-frame {
+    width: 110px;
+    height: 80px;
+    background: #ffffff;
+    padding: 4px;
+    border-radius: 4px;
+    transform: rotate(-4deg);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+  }
+
+  .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #1e2030;
+    color: hsl(var(--neon-orange));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .travel-deco {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .badge {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid hsla(var(--border-glass));
+    color: hsl(var(--text-secondary));
+    text-align: center;
+  }
+
+  /* Responsive Bento Grid */
+  @media (max-width: 900px) {
+    .bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .card-music {
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .bento-grid {
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
+    }
+    .card-tech, .card-music, .card-gaming, .card-travel {
+      grid-column: span 1;
+    }
+    .travel-mockup {
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+</style>

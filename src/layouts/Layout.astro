@@ -1,0 +1,333 @@
+---
+import '../styles/index.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+}
+
+const { 
+  title = "猛男妙妙屋", 
+  description = "欢迎来到猛男妙妙屋！这里记录我的开发日常、技术学习笔记以及对生活的思考。",
+  image = "https://github.com/LiuMozz.png"
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://liumozz.github.io/');
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+
+		<!-- Primary Meta Tags -->
+		<title>{title}</title>
+		<meta name="title" content={title} />
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalURL} />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={Astro.url} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={image} />
+
+		<!-- Twitter -->
+		<meta property="twitter:card" content="summary_large_image" />
+		<meta property="twitter:url" content={Astro.url} />
+		<meta property="twitter:title" content={title} />
+		<meta property="twitter:description" content={description} />
+		<meta property="twitter:image" content={image} />
+	</head>
+	<body>
+		<!-- Glowing Navigation Header -->
+		<header class="site-header glass">
+			<nav class="nav-container">
+				<a href="/" class="logo">
+					<span class="logo-accent">⚡</span> 猛男妙妙屋
+				</a>
+				<ul class="nav-links">
+					<li><a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>首页</a></li>
+					<li><a href="/posts" class={Astro.url.pathname.startsWith('/posts') ? 'active' : ''}>技术</a></li>
+					<li><a href="/music" class={Astro.url.pathname.startsWith('/music') ? 'active' : ''}>音乐</a></li>
+					<li><a href="/gaming" class={Astro.url.pathname.startsWith('/gaming') ? 'active' : ''}>游戏</a></li>
+					<li><a href="/travel" class={Astro.url.pathname.startsWith('/travel') ? 'active' : ''}>旅行</a></li>
+					<li><a href="/archives" class={Astro.url.pathname.startsWith('/archives') ? 'active' : ''}>归档</a></li>
+					<li><a href="/search" class={Astro.url.pathname.startsWith('/search') ? 'active' : ''} id="nav-search-btn">🔍 搜索</a></li>
+				</ul>
+				<button class="mobile-nav-toggle" aria-label="Toggle Menu">
+					<span></span>
+					<span></span>
+					<span></span>
+				</button>
+			</nav>
+		</header>
+
+		<!-- Main Page Area -->
+		<main class="main-content">
+			<slot />
+		</main>
+
+		<!-- Glowing Footer -->
+		<footer class="site-footer glass">
+			<div class="footer-content">
+				<p class="copyright">&copy; {new Date().getFullYear()} LiuMozz. Built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a> ✨</p>
+				<div class="socials">
+					<a href="https://github.com/LiuMozz" target="_blank" rel="noopener" class="social-icon github" aria-label="GitHub">
+						<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+					</a>
+					<a href="mailto:liurushwhite@gmail.com" class="social-icon email" aria-label="Email">
+						<svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+					</a>
+				</div>
+			</div>
+		</footer>
+
+		<script>
+			// Mobile Navigation Toggle
+			const toggleBtn = document.querySelector('.mobile-nav-toggle');
+			const navLinks = document.querySelector('.nav-links');
+
+			if (toggleBtn && navLinks) {
+				toggleBtn.addEventListener('click', () => {
+					toggleBtn.classList.toggle('active');
+					navLinks.classList.toggle('open');
+				});
+			}
+
+			// Glow card mouse tracker
+			document.addEventListener('mousemove', (e) => {
+				const cards = document.querySelectorAll('.glow-card');
+				cards.forEach(card => {
+					const rect = card.getBoundingClientRect();
+					const x = e.clientX - rect.left;
+					const y = e.clientY - rect.top;
+					(card as HTMLElement).style.setProperty('--mouse-x', `${x}px`);
+					(card as HTMLElement).style.setProperty('--mouse-y', `${y}px`);
+				});
+			});
+		</script>
+	</body>
+</html>
+
+<style>
+	/* Header Navigation */
+	.site-header {
+		position: sticky;
+		top: 0;
+		z-index: 100;
+		margin: 1.5rem auto;
+		width: 90%;
+		max-width: 1200px;
+		border-radius: var(--radius-lg);
+		padding: 0.8rem 2rem;
+		border-color: hsla(var(--border-glass));
+	}
+
+	.nav-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.logo {
+		font-family: var(--font-display);
+		font-size: 1.4rem;
+		font-weight: 800;
+		color: #ffffff;
+		text-decoration: none;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		transition: var(--transition-smooth);
+	}
+
+	.logo-accent {
+		filter: drop-shadow(0 0 8px hsl(var(--neon-cyan)));
+		animation: spin 8s linear infinite;
+	}
+
+	.nav-links {
+		display: flex;
+		list-style: none;
+		gap: 1.5rem;
+		align-items: center;
+	}
+
+	.nav-links a {
+		color: hsl(var(--text-secondary));
+		text-decoration: none;
+		font-weight: 500;
+		font-size: 0.95rem;
+		padding: 0.5rem 1rem;
+		border-radius: var(--radius-sm);
+		transition: var(--transition-smooth);
+		border: 1px solid transparent;
+	}
+
+	.nav-links a:hover, .nav-links a.active {
+		color: hsl(var(--neon-cyan));
+		background: hsla(var(--neon-cyan), 0.08);
+		border-color: hsla(var(--neon-cyan), 0.25);
+		box-shadow: 0 0 15px -3px hsla(var(--neon-cyan), 0.2);
+		text-shadow: 0 0 5px hsla(var(--neon-cyan), 0.5);
+	}
+
+	#nav-search-btn {
+		background: hsla(var(--neon-purple), 0.1);
+		border-color: hsla(var(--neon-purple), 0.2);
+		color: hsl(var(--text-primary));
+	}
+
+	#nav-search-btn:hover, #nav-search-btn.active {
+		color: #ffffff;
+		background: hsla(var(--neon-purple), 0.2);
+		border-color: hsla(var(--neon-purple), 0.5);
+		box-shadow: 0 0 15px -3px hsla(var(--neon-purple), 0.4);
+		text-shadow: 0 0 5px hsla(var(--neon-purple), 0.5);
+	}
+
+	.mobile-nav-toggle {
+		display: none;
+		flex-direction: column;
+		justify-content: space-between;
+		width: 22px;
+		height: 18px;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		z-index: 101;
+	}
+
+	.mobile-nav-toggle span {
+		width: 100%;
+		height: 2px;
+		background-color: hsl(var(--text-primary));
+		transition: var(--transition-smooth);
+	}
+
+	/* Main Layout Content */
+	.main-content {
+		flex: 1;
+		width: 90%;
+		max-width: 1200px;
+		margin: 0 auto 3rem auto;
+		display: flex;
+		flex-direction: column;
+	}
+
+	/* Footer styling */
+	.site-footer {
+		width: 90%;
+		max-width: 1200px;
+		margin: auto auto 1.5rem auto;
+		padding: 1.2rem 2rem;
+		border-radius: var(--radius-md);
+		border-color: hsla(var(--border-glass));
+	}
+
+	.footer-content {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+
+	.copyright {
+		color: hsl(var(--text-muted));
+		font-size: 0.9rem;
+	}
+
+	.copyright a {
+		color: hsl(var(--text-secondary));
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	.copyright a:hover {
+		color: hsl(var(--neon-cyan));
+	}
+
+	.socials {
+		display: flex;
+		gap: 1rem;
+	}
+
+	.social-icon {
+		color: hsl(var(--text-secondary));
+		transition: var(--transition-smooth);
+		padding: 0.4rem;
+		border-radius: 50%;
+		background: hsla(var(--card-bg), 0.6);
+		border: 1px solid hsla(var(--border-glass));
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.social-icon:hover {
+		color: #ffffff;
+		transform: scale(1.1);
+	}
+
+	.social-icon.github:hover {
+		border-color: hsla(var(--neon-cyan), 0.5);
+		box-shadow: 0 0 10px hsla(var(--neon-cyan), 0.3);
+	}
+
+	.social-icon.email:hover {
+		border-color: hsla(var(--neon-purple), 0.5);
+		box-shadow: 0 0 10px hsla(var(--neon-purple), 0.3);
+	}
+
+	/* Responsive header design */
+	@media (max-width: 768px) {
+		.site-header {
+			padding: 1rem;
+		}
+
+		.mobile-nav-toggle {
+			display: flex;
+		}
+
+		.mobile-nav-toggle.active span:nth-child(1) {
+			transform: rotate(45deg) translate(5px, 6px);
+		}
+
+		.mobile-nav-toggle.active span:nth-child(2) {
+			opacity: 0;
+		}
+
+		.mobile-nav-toggle.active span:nth-child(3) {
+			transform: rotate(-45deg) translate(5px, -6px);
+		}
+
+		.nav-links {
+			position: fixed;
+			top: 0;
+			right: -100%;
+			width: 70%;
+			height: 100vh;
+			background: hsla(var(--bg-color), 0.95);
+			backdrop-filter: blur(20px);
+			flex-direction: column;
+			justify-content: center;
+			gap: 2rem;
+			z-index: 100;
+			transition: right 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+			border-left: 1px solid hsla(var(--border-glass));
+			box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+		}
+
+		.nav-links.open {
+			right: 0;
+		}
+	}
+</style>

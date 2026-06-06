@@ -1,0 +1,270 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+
+const posts = await getCollection('posts');
+
+// Compile a safe search index payload for client-side matching
+const searchIndex = posts
+  .filter(post => !post.data.draft)
+  .map(post => ({
+    id: post.id,
+    title: post.data.title,
+    description: post.data.description || '',
+    date: post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+    tags: post.data.tags,
+    body: post.body // full-text search
+  }));
+---
+
+<Layout 
+  title="🔍 全站搜索 | 猛男妙妙屋" 
+  description="在猛男妙妙屋中搜索你感兴趣的文章和主题，即时响应，支持全文检索。"
+>
+  <div class="search-page">
+    <header class="search-header">
+      <h1 class="page-title text-gradient-cyan">🔍 全站搜索</h1>
+      <p class="page-subtitle">即时过滤，支持标题、描述、标签及全文内容匹配。</p>
+    </header>
+
+    <div class="search-container">
+      <!-- Search Input Box -->
+      <div class="search-box-wrapper glass">
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="输入关键字开始检索..." 
+          autocomplete="off" 
+          autofocus
+        />
+        <div class="search-icon-glow"></div>
+      </div>
+
+      <!-- Results Stats -->
+      <p class="search-stats" id="search-stats-text">正在初始化搜索库...</p>
+
+      <!-- Results Output -->
+      <div class="search-results-list" id="search-results">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .search-page {
+    padding: 2rem 0;
+  }
+
+  .search-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    color: hsl(var(--text-secondary));
+    font-size: 1.05rem;
+  }
+
+  .search-container {
+    max-width: 750px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .search-box-wrapper {
+    position: relative;
+    padding: 0.5rem 1.5rem;
+    border-radius: var(--radius-md);
+    border-color: hsla(var(--border-glass));
+    display: flex;
+    align-items: center;
+    transition: var(--transition-smooth);
+  }
+
+  .search-box-wrapper:focus-within {
+    border-color: hsla(var(--neon-cyan), 0.4);
+    box-shadow: 0 0 25px -5px hsla(var(--neon-cyan), 0.3);
+  }
+
+  #search-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-size: 1.2rem;
+    padding: 0.8rem 0;
+    font-family: inherit;
+  }
+
+  #search-input::placeholder {
+    color: hsl(var(--text-muted));
+  }
+
+  .search-stats {
+    font-size: 0.88rem;
+    color: hsl(var(--text-secondary));
+    margin: 1.5rem 0 1rem 0;
+    padding-left: 0.5rem;
+  }
+
+  .search-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Shared card style (reused for results) */
+  .search-result-card {
+    padding: 1.5rem 2rem;
+    border-color: hsla(var(--border-glass));
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: var(--transition-smooth);
+  }
+
+  .search-result-card:hover {
+    border-color: hsla(var(--neon-cyan), 0.4);
+    box-shadow: 0 8px 20px -5px hsla(var(--neon-cyan), 0.2);
+    transform: translateY(-2px);
+  }
+
+  .result-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: hsl(var(--text-muted));
+  }
+
+  .result-date {
+    font-family: monospace;
+  }
+
+  .result-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ffffff;
+    transition: var(--transition-smooth);
+  }
+
+  .search-result-card:hover .result-title {
+    color: hsl(var(--neon-cyan));
+  }
+
+  .result-desc {
+    font-size: 0.92rem;
+    color: hsl(var(--text-secondary));
+    line-height: 1.5;
+  }
+
+  .result-tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .result-tag-badge {
+    font-size: 0.75rem;
+    color: hsl(var(--text-muted));
+    border: 1px solid hsla(var(--border-glass));
+    background: rgba(255,255,255,0.02);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .empty-search-state {
+    padding: 3rem;
+    text-align: center;
+    color: hsl(var(--text-secondary));
+  }
+</style>
+
+<!-- Pass index variable safely into client script tags -->
+<script define:vars={{ searchIndex }}>
+  const searchInput = document.getElementById('search-input');
+  const resultsContainer = document.getElementById('search-results');
+  const statsText = document.getElementById('search-stats-text');
+
+  // Trigger search on typing
+  if (searchInput && resultsContainer && statsText) {
+    // Initial display: show all posts
+    renderResults(searchIndex);
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim().toLowerCase();
+      
+      if (!query) {
+        renderResults(searchIndex);
+        return;
+      }
+
+      // Filter articles matching keywords
+      const filtered = searchIndex.filter(post => {
+        const titleMatch = post.title.toLowerCase().includes(query);
+        const descMatch = post.description.toLowerCase().includes(query);
+        const tagMatch = post.tags.some(tag => tag.toLowerCase().includes(query));
+        const bodyMatch = post.body.toLowerCase().includes(query);
+        return titleMatch || descMatch || tagMatch || bodyMatch;
+      });
+
+      renderResults(filtered, query);
+    });
+  }
+
+  function renderResults(list, query = '') {
+    if (!resultsContainer || !statsText) return;
+
+    if (list.length === 0) {
+      statsText.innerText = `未找到与 "${query}" 相关的文章`;
+      resultsContainer.innerHTML = `
+        <div class="empty-search-state glass">
+          <p>📭 没有检索到任何内容，换个词试试吧！</p>
+        </div>
+      `;
+      return;
+    }
+
+    statsText.innerText = query 
+      ? `找到 ${list.length} 篇包含 "${query}" 的结果`
+      : `当前共收录 ${list.length} 篇文章`;
+
+    resultsContainer.innerHTML = list.map(post => `
+      <a href="/posts/${post.id}" class="search-result-card glass glow-card accent-cyan">
+        <div class="result-meta">
+          <span class="result-date">📅 ${post.date}</span>
+          <span class="result-arrow">→</span>
+        </div>
+        <h2 class="result-title">${highlightKeywords(post.title, query)}</h2>
+        <p class="result-desc">${highlightKeywords(post.description || post.body.substring(0, 150) + '...', query)}</p>
+        ${post.tags.length > 0 ? `
+          <div class="result-tags">
+            ${post.tags.map(t => `<span class="result-tag-badge">#${t}</span>`).join('')}
+          </div>
+        ` : ''}
+      </a>
+    `).join('');
+  }
+
+  // Highlights matched query terms in HTML strings safely
+  function highlightKeywords(text, query) {
+    if (!query) return text;
+    // Escaping helper
+    const escapedText = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+      
+    const regex = new RegExp(`(${query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, 'gi');
+    return escapedText.replace(regex, '<mark style="background: hsla(185, 100%, 50%, 0.25); color: #fff; padding: 0.1rem 0.2rem; border-radius: 2px;">$1</mark>');
+  }
+</script>

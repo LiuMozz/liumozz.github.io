@@ -1,0 +1,174 @@
+---
+interface Props {
+  title: string;
+  subtitle: string;
+  href: string;
+  accent: 'cyan' | 'purple' | 'emerald' | 'orange' | 'pink';
+  class?: string;
+}
+
+const { title, subtitle, href, accent, class: className = '' } = Astro.props;
+
+const accentColors = {
+  cyan: 'hsla(var(--neon-cyan), 0.3)',
+  purple: 'hsla(var(--neon-purple), 0.3)',
+  emerald: 'hsla(var(--neon-emerald), 0.3)',
+  orange: 'hsla(var(--neon-orange), 0.3)',
+  pink: 'hsla(var(--neon-pink), 0.3)'
+};
+
+const textAccentClasses = {
+  cyan: 'text-gradient-cyan',
+  purple: 'text-gradient-purple',
+  emerald: 'text-gradient-emerald',
+  orange: 'text-gradient-orange',
+  pink: 'text-gradient-purple'
+};
+---
+
+<a href={href} class={`bento-card glass glow-card accent-${accent} ${className}`} data-tilt>
+  <div class="card-glow" style={`--accent-color: ${accentColors[accent]}`}></div>
+  <div class="card-content">
+    <div class="card-header">
+      <span class={`card-title ${textAccentClasses[accent]}`}>{title}</span>
+      <span class="card-arrow">→</span>
+    </div>
+    <p class="card-subtitle">{subtitle}</p>
+    <div class="card-slot">
+      <slot />
+    </div>
+  </div>
+</a>
+
+<style>
+  .bento-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    text-decoration: none;
+    overflow: hidden;
+    height: 100%;
+    min-height: 220px;
+    border-color: hsla(var(--border-glass));
+    transition: var(--transition-smooth), transform 0.1s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  .card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--accent-color) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .bento-card:hover {
+    border-color: var(--accent-border);
+    box-shadow: 0 10px 30px -10px var(--accent-shadow);
+  }
+
+  .bento-card:hover .card-glow {
+    opacity: 1;
+  }
+
+  /* Accent theme styling variables mapping */
+  .accent-cyan {
+    --accent-border: hsla(var(--neon-cyan), 0.4);
+    --accent-shadow: hsla(var(--neon-cyan), 0.25);
+  }
+  .accent-purple {
+    --accent-border: hsla(var(--neon-purple), 0.4);
+    --accent-shadow: hsla(var(--neon-purple), 0.25);
+  }
+  .accent-emerald {
+    --accent-border: hsla(var(--neon-emerald), 0.4);
+    --accent-shadow: hsla(var(--neon-emerald), 0.25);
+  }
+  .accent-orange {
+    --accent-border: hsla(var(--neon-orange), 0.4);
+    --accent-shadow: hsla(var(--neon-orange), 0.25);
+  }
+  .accent-pink {
+    --accent-border: hsla(var(--neon-pink), 0.4);
+    --accent-shadow: hsla(var(--neon-pink), 0.25);
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    z-index: 2;
+    transform: translateZ(20px); /* 3D layer lift */
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  .card-arrow {
+    font-size: 1.2rem;
+    color: hsl(var(--text-muted));
+    transition: var(--transition-bounce);
+  }
+
+  .bento-card:hover .card-arrow {
+    transform: translateX(5px) scale(1.2);
+    color: #ffffff;
+  }
+
+  .card-subtitle {
+    font-size: 0.9rem;
+    color: hsl(var(--text-secondary));
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .card-slot {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+</style>
+
+<script>
+  // Dynamic 3D tilt script
+  const cards = document.querySelectorAll('[data-tilt]');
+  
+  cards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      // Calculate rotation angles (-10deg to 10deg max)
+      const rotateX = ((y / h) - 0.5) * -15;
+      const rotateY = ((x / w) - 0.5) * 15;
+      
+      (card as HTMLElement).style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    });
+    
+    card.addEventListener('mouseleave', () => {
+      (card as HTMLElement).style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    });
+  });
+</script>

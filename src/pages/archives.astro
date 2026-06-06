@@ -1,0 +1,239 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+
+const posts = (await getCollection('posts'))
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Group articles by year
+const postsByYear: Record<number, typeof posts> = {};
+posts.forEach(post => {
+  const year = post.data.date.getFullYear();
+  if (!postsByYear[year]) {
+    postsByYear[year] = [];
+  }
+  postsByYear[year].push(post);
+});
+
+const years = Object.keys(postsByYear).map(Number).sort((a, b) => b - a);
+---
+
+<Layout 
+  title="📅 文章归档 | 猛男妙妙屋" 
+  description="浏览所有历史文章，按照年份和时间顺序整理归档。"
+>
+  <div class="archives-page">
+    <header class="archives-header">
+      <h1 class="page-title text-gradient-cyan">📅 文章归档</h1>
+      <p class="page-subtitle">时间的长河里，每一篇文字都是一个脚印。目前共计 {posts.length} 篇文章。</p>
+    </header>
+
+    <div class="archives-container">
+      {years.length > 0 ? (
+        <div class="timeline-vertical">
+          {years.map(year => (
+            <div class="timeline-year-group">
+              <h2 class="timeline-year-title">{year}</h2>
+              <div class="timeline-posts-list">
+                {postsByYear[year].map(post => (
+                  <div class="timeline-post-item">
+                    <span class="post-item-date">
+                      {post.data.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
+                    </span>
+                    <div class="post-item-card glass glow-card accent-cyan">
+                      <a href={`/posts/${post.id}`} class="post-item-title-link">
+                        <h3 class="post-item-title">{post.data.title}</h3>
+                      </a>
+                      {post.data.tags.length > 0 && (
+                        <div class="post-item-tags">
+                          {post.data.tags.map(tag => (
+                            <a href={`/tags/${tag}`} class="post-item-tag">#{tag}</a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div class="no-archives glass">
+          <p>📭 暂无归档内容，敬请期待！</p>
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .archives-page {
+    padding: 2rem 0;
+  }
+
+  .archives-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    color: hsl(var(--text-secondary));
+    font-size: 1.05rem;
+  }
+
+  .archives-container {
+    max-width: 750px;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  /* Vertical timeline line */
+  .timeline-vertical {
+    border-left: 2px solid hsla(var(--border-glass));
+    position: relative;
+  }
+
+  .timeline-year-group {
+    position: relative;
+    margin-bottom: 3rem;
+  }
+
+  .timeline-year-title {
+    font-size: 1.8rem;
+    color: #ffffff;
+    font-weight: 800;
+    font-family: var(--font-display);
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-left: 1.5rem;
+    transform: translateY(-8px);
+  }
+
+  /* Year node marker */
+  .timeline-year-title::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: hsl(var(--neon-cyan));
+    border: 2px solid hsl(var(--bg-color));
+    box-shadow: 0 0 10px hsl(var(--neon-cyan));
+  }
+
+  .timeline-posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .timeline-post-item {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    padding-left: 1.5rem;
+  }
+
+  /* Post node marker */
+  .timeline-post-item::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 25px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: hsla(var(--text-muted), 0.5);
+    border: 1px solid hsl(var(--bg-color));
+    transition: var(--transition-smooth);
+    z-index: 2;
+  }
+
+  .timeline-post-item:hover::before {
+    background: hsl(var(--neon-purple));
+    box-shadow: 0 0 8px hsl(var(--neon-purple));
+  }
+
+  .post-item-date {
+    width: 60px;
+    flex-shrink: 0;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: hsl(var(--text-muted));
+    padding-top: 1.1rem;
+  }
+
+  .post-item-card {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border-color: hsla(var(--border-glass));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    transition: var(--transition-smooth);
+  }
+
+  .post-item-card:hover {
+    border-color: hsla(var(--neon-cyan), 0.3);
+    box-shadow: 0 5px 15px -3px hsla(var(--neon-cyan), 0.15);
+    transform: translateX(4px);
+  }
+
+  .post-item-title-link {
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+    min-width: 250px;
+  }
+
+  .post-item-title {
+    font-size: 1.08rem;
+    font-weight: 600;
+    transition: var(--transition-smooth);
+  }
+
+  .post-item-card:hover .post-item-title {
+    color: hsl(var(--neon-cyan));
+  }
+
+  .post-item-tags {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .post-item-tag {
+    font-size: 0.72rem;
+    color: hsl(var(--text-muted));
+    border: 1px solid hsla(var(--border-glass));
+    background: rgba(255,255,255,0.02);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+  }
+
+  .post-item-tag:hover {
+    color: hsl(var(--neon-purple));
+    border-color: hsl(var(--neon-purple));
+  }
+
+  .no-archives {
+    padding: 3rem;
+    text-align: center;
+    color: hsl(var(--text-secondary));
+  }
+</style>

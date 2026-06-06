@@ -1,0 +1,90 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VideoCard from '../components/VideoCard.astro';
+import VideoModal from '../components/VideoModal.astro';
+
+const gamingVideos = [
+  {
+    title: "Arcade Retro Challenge",
+    description: "重温经典街机，挑战高难度关卡，指尖飞舞的复古电竞快感。",
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-playing-retro-arcade-game-console-40502-large.mp4",
+    thumbnailUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600&auto=format&fit=crop&q=80",
+    tag: "街机复古",
+    accent: "emerald" as const
+  },
+  {
+    title: "Cyberpunk Neon Nights",
+    description: "赛博朋克风霓虹街道穿梭，感受未来科技与黑夜霓虹的交织。",
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-cyberpunk-neon-city-street-at-night-42253-large.mp4",
+    thumbnailUrl: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600&auto=format&fit=crop&q=80",
+    tag: "赛博视觉",
+    accent: "cyan" as const
+  },
+  {
+    title: "Mechanical Keyboard Pulse",
+    description: "深夜码字与电竞神器，红光键帽轴体下的极速敲击体验。",
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-gamer-playing-with-a-red-lighted-keyboard-40504-large.mp4",
+    thumbnailUrl: "https://images.unsplash.com/photo-1612287230202-1bf1d85d1bdf?w=600&auto=format&fit=crop&q=80",
+    tag: "极客外设",
+    accent: "purple" as const
+  }
+];
+---
+
+<Layout 
+  title="🎮 游戏空间 | 猛男妙妙屋" 
+  description="进入猛男妙妙屋的游戏空间，这里记录了我热爱的游戏日常、复古街机和极客外设瞬间。"
+>
+  <div class="gaming-page">
+    <div class="gaming-header">
+      <h1 class="page-title text-gradient-emerald">🎮 游戏空间</h1>
+      <p class="page-subtitle">指尖上的博弈，属于玩家的无尽冒险。悬停卡片预览，点击观看高清视频。</p>
+    </div>
+
+    <!-- Gallery Grid -->
+    <div class="video-grid-container">
+      {gamingVideos.map(video => (
+        <VideoCard 
+          title={video.title}
+          description={video.description}
+          videoUrl={video.videoUrl}
+          thumbnailUrl={video.thumbnailUrl}
+          tag={video.tag}
+          accent={video.accent}
+        />
+      ))}
+    </div>
+  </div>
+
+  <!-- Shared Video Modal -->
+  <VideoModal />
+</Layout>
+
+<style>
+  .gaming-page {
+    padding: 2rem 0;
+  }
+
+  .gaming-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    color: hsl(var(--text-secondary));
+    font-size: 1.05rem;
+  }
+
+  .video-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+</style>

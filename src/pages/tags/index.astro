@@ -1,0 +1,115 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+const posts = await getCollection('posts');
+
+const tagsCount: Record<string, number> = {};
+posts.forEach(post => {
+  if (!post.data.draft) {
+    post.data.tags.forEach(tag => {
+      tagsCount[tag] = (tagsCount[tag] || 0) + 1;
+    });
+  }
+});
+
+const tags = Object.entries(tagsCount).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+---
+
+<Layout 
+  title="🏷️ 标签云 | 猛男妙妙屋" 
+  description="浏览技术博客的所有标签分类，寻找你感兴趣的文章主题。"
+>
+  <div class="tags-page">
+    <header class="tags-header">
+      <h1 class="page-title text-gradient-purple">🏷️ 标签分类</h1>
+      <p class="page-subtitle">按标签浏览文章，快捷检索你需要的技术专题。</p>
+    </header>
+
+    <div class="tags-container glass">
+      {tags.length > 0 ? (
+        <div class="tags-grid">
+          {tags.map(([tag, count]) => (
+            <a href={`/tags/${tag}`} class="tag-item glass glow-card accent-purple">
+              <span class="tag-name">#{tag}</span>
+              <span class="tag-count">{count} 篇</span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="no-tags">暂无标签数据...</p>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .tags-page {
+    padding: 2rem 0;
+  }
+
+  .tags-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    color: hsl(var(--text-secondary));
+    font-size: 1.05rem;
+  }
+
+  .tags-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2.5rem;
+    border-color: hsla(var(--border-glass));
+  }
+
+  .tags-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    justify-content: center;
+  }
+
+  .tag-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    border-color: hsla(var(--border-glass));
+    transition: var(--transition-smooth);
+  }
+
+  .tag-item:hover {
+    border-color: hsla(var(--neon-purple), 0.4);
+    box-shadow: 0 5px 15px -3px hsla(var(--neon-purple), 0.25);
+    transform: translateY(-2px);
+  }
+
+  .tag-name {
+    font-weight: 600;
+    color: hsl(var(--neon-purple));
+    font-size: 1.05rem;
+  }
+
+  .tag-count {
+    font-size: 0.8rem;
+    color: hsl(var(--text-secondary));
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .no-tags {
+    text-align: center;
+    color: hsl(var(--text-secondary));
+  }
+</style>

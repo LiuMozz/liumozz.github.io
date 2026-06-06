@@ -1,0 +1,233 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  tag?: string;
+  accent?: 'cyan' | 'purple' | 'emerald' | 'orange';
+}
+
+const { title, description, videoUrl, thumbnailUrl, tag = '精彩瞬间', accent = 'cyan' } = Astro.props;
+---
+
+<div 
+  class={`video-card glass glow-card accent-${accent}`} 
+  data-video-url={videoUrl}
+  data-video-title={title}
+  data-video-desc={description}
+>
+  <div class="video-preview-wrapper">
+    <!-- Static Thumbnail -->
+    <img src={thumbnailUrl} alt={title} class="video-thumbnail" />
+    
+    <!-- Silent Preview Video -->
+    <video 
+      src={videoUrl} 
+      class="video-preview-tag" 
+      muted 
+      loop 
+      playsinline 
+      preload="none"
+    ></video>
+    
+    <!-- Hover Play Overlay -->
+    <div class="hover-play-overlay">
+      <div class="play-btn-circle">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+      </div>
+      <span class="preview-text">点击播放高清 ⚡</span>
+    </div>
+
+    <span class="video-tag">{tag}</span>
+  </div>
+
+  <div class="video-card-info">
+    <h3 class="video-title">{title}</h3>
+    <p class="video-desc">{description}</p>
+  </div>
+</div>
+
+<style>
+  .video-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    cursor: pointer;
+    border-color: hsla(var(--border-glass));
+    transition: var(--transition-smooth);
+    border-radius: var(--radius-md);
+  }
+
+  .accent-cyan {
+    --accent-glow: hsla(var(--neon-cyan), 0.3);
+    --tag-bg: hsla(var(--neon-cyan), 0.2);
+    --tag-color: hsl(var(--neon-cyan));
+  }
+  .accent-purple {
+    --accent-glow: hsla(var(--neon-purple), 0.3);
+    --tag-bg: hsla(var(--neon-purple), 0.2);
+    --tag-color: hsl(var(--neon-purple));
+  }
+  .accent-emerald {
+    --accent-glow: hsla(var(--neon-emerald), 0.3);
+    --tag-bg: hsla(var(--neon-emerald), 0.2);
+    --tag-color: hsl(var(--neon-emerald));
+  }
+  .accent-orange {
+    --accent-glow: hsla(var(--neon-orange), 0.3);
+    --tag-bg: hsla(var(--neon-orange), 0.2);
+    --tag-color: hsl(var(--neon-orange));
+  }
+
+  .video-card:hover {
+    border-color: var(--tag-color);
+    box-shadow: 0 10px 25px -5px var(--accent-glow);
+    transform: translateY(-5px);
+  }
+
+  .video-preview-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    overflow: hidden;
+  }
+
+  .video-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition-smooth);
+  }
+
+  .video-preview-tag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  /* Hover auto-preview logic classes triggers */
+  .video-card.previewing .video-preview-tag {
+    opacity: 1;
+  }
+
+  .video-card.previewing .video-thumbnail {
+    opacity: 0;
+  }
+
+  .hover-play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 3;
+  }
+
+  .video-card:hover .hover-play-overlay {
+    opacity: 1;
+  }
+
+  .play-btn-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--tag-color);
+    box-shadow: 0 0 15px var(--tag-color);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-bounce);
+  }
+
+  .video-card:hover .play-btn-circle {
+    transform: scale(1.1);
+  }
+
+  .preview-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-shadow: 0 0 5px rgba(0,0,0,0.8);
+  }
+
+  .video-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--tag-bg);
+    color: var(--tag-color);
+    border: 1px solid var(--tag-color);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    z-index: 2;
+  }
+
+  .video-card-info {
+    padding: 1.2rem;
+  }
+
+  .video-title {
+    font-size: 1.1rem;
+    color: #ffffff;
+    margin-bottom: 0.4rem;
+    transition: var(--transition-smooth);
+  }
+
+  .video-card:hover .video-title {
+    color: var(--tag-color);
+  }
+
+  .video-desc {
+    font-size: 0.85rem;
+    color: hsl(var(--text-secondary));
+    line-height: 1.4;
+  }
+</style>
+
+<script>
+  // Hover preview scripts
+  const videoCards = document.querySelectorAll('.video-card');
+  
+  videoCards.forEach(card => {
+    const video = card.querySelector('.video-preview-tag') as HTMLVideoElement;
+    
+    card.addEventListener('mouseenter', () => {
+      card.classList.add('previewing');
+      if (video) {
+        // Preload video if needed and play
+        if (video.readyState === 0) {
+          video.load();
+        }
+        video.play().catch(err => {
+          console.log("Silent auto-preview play prevented:", err);
+        });
+      }
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.classList.remove('previewing');
+      if (video) {
+        video.pause();
+        video.currentTime = 0;
+      }
+    });
+  });
+</script>

@@ -1,0 +1,39 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MusicPlayer from '../components/MusicPlayer.astro';
+---
+
+<Layout 
+  title="🎵 音乐妙妙屋 | 猛男妙妙屋" 
+  description="进入猛男妙妙屋的音乐馆，享受一段放松的时光吧。带上耳机，感受黑胶唱片的跳动。"
+>
+  <div class="music-page">
+    <div class="music-header">
+      <h1 class="page-title text-gradient-purple">🎵 音乐馆</h1>
+      <p class="page-subtitle">聆听旋律，享受开发和写作过程中的片刻静谧。</p>
+    </div>
+
+    <MusicPlayer />
+  </div>
+</Layout>
+
+<style>
+  .music-page {
+    padding: 2rem 0;
+  }
+
+  .music-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    color: hsl(var(--text-secondary));
+    font-size: 1.05rem;
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AvatarBio from '../components/AvatarBio.astro';
+import BentoGrid from '../components/BentoGrid.astro';
+---
+
+<Layout 
+  title="⚡ 猛男妙妙屋 | 个人主页" 
+  description="欢迎来到猛男妙妙屋！这里记录我的开发日常、技术学习笔记以及对生活的思考。"
+>
+  <div class="home-container">
+    <!-- Biography / Profile Section -->
+    <section class="profile-section">
+      <AvatarBio />
+    </section>
+
+    <!-- Bento Grid Section -->
+    <section class="modules-section">
+      <BentoGrid />
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .home-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem 0;
+  }
+
+  .profile-section {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  .modules-section {
+    width: 100%;
+  }
+</style>
