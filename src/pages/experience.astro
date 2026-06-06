@@ -1,0 +1,672 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="🗺️ 经历 | 猛男妙妙屋"
+  description="step by step, to the colorful life — 我的教育与工作经历：浙江大学、华为昇腾、蚂蚁集团AILab。"
+>
+  <div class="experience-page">
+    <div class="exp-header">
+      <h1 class="page-title text-gradient-cyan">🗺️ 经历</h1>
+      <p class="page-subtitle">step by step, to the colorful life</p>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-container">
+
+      <!-- Ant Group (Current) -->
+      <div class="timeline-item" id="exp-ant">
+        <div class="timeline-dot dot-ant"></div>
+        <div class="timeline-connector"></div>
+        <div class="exp-detail-card card-ant glass" onclick="toggleDetail('ant')">
+          <!-- Left: Logo Column -->
+          <div class="card-logo-col col-ant">
+            <div class="logo-wrapper">
+              <img src="/logos/ant-group.svg" alt="蚂蚁集团" class="brand-logo brand-logo-img" />
+              <div class="logo-label">Ant Group</div>
+            </div>
+          </div>
+
+          <!-- Right: Content -->
+          <div class="card-content">
+            <div class="card-summary">
+              <div class="card-meta">
+                <span class="card-badge badge-ant">在职</span>
+                <span class="card-period">2024.9 — 至今</span>
+              </div>
+              <h2 class="card-org">蚂蚁集团</h2>
+              <div class="card-role-row">
+                <span class="card-dept">财保事业群 AILab</span>
+                <span class="card-divider">·</span>
+                <span class="card-role">应用开发工程师</span>
+              </div>
+              <div class="expand-hint" id="ant-hint">
+                <span>点击展开详情</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+
+            <!-- Expanded Detail -->
+            <div class="card-detail" id="ant-detail">
+              <div class="detail-divider"></div>
+              <div class="detail-tags">
+                <span class="tag tag-ant">Java</span>
+                <span class="tag tag-ant">Spring Boot</span>
+                <span class="tag tag-ant">AI / LLM</span>
+                <span class="tag tag-ant">微服务</span>
+                <span class="tag tag-ant">保险科技</span>
+              </div>
+              <ul class="detail-list">
+                <li>负责财险/寿险业务线 AI 能力落地，基于大语言模型开发智能核保、理赔辅助等应用系统。</li>
+                <li>参与 AILab 内部平台建设，构建模型推理服务链路，优化推理吞吐与时延性能。</li>
+                <li>主导业务中台微服务拆分与治理，推动存量系统向云原生架构迁移。</li>
+                <li>与算法团队协作，落地 RAG 检索增强生成方案于保险问答场景，满意度提升显著。</li>
+              </ul>
+              <p class="detail-note">📍 杭州市 · 黄龙国际中心</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Huawei -->
+      <div class="timeline-item" id="exp-hw">
+        <div class="timeline-dot dot-huawei"></div>
+        <div class="timeline-connector"></div>
+        <div class="exp-detail-card card-huawei glass" onclick="toggleDetail('hw')">
+          <!-- Left: Logo Column -->
+          <div class="card-logo-col col-huawei">
+            <div class="logo-wrapper">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="brand-logo" fill="white">
+                <path d="M3.67 6.14S1.82 7.91 1.72 9.78v.35c.08 1.51 1.22 2.4 1.22 2.4 1.83 1.79 6.26 4.04 7.3 4.55 0 0 .06.03.1-.01l.02-.04v-.04C7.52 10.8 3.67 6.14 3.67 6.14zM9.65 18.6c-.02-.08-.1-.08-.1-.08l-7.38.26c.8 1.43 2.15 2.53 3.56 2.2.96-.25 3.16-1.78 3.88-2.3.06-.05.04-.09.04-.09zm.08-.78C6.49 15.63.21 12.28.21 12.28c-.15.46-.2.9-.21 1.3v.07c0 1.07.4 1.82.4 1.82.8 1.69 2.34 2.2 2.34 2.2.7.3 1.4.31 1.4.31.12.02 4.4 0 5.54 0 .05 0 .08-.05.08-.05v-.06c0-.03-.03-.05-.03-.05zM9.06 3.19a3.42 3.42 0 00-2.57 3.15v.41c.03.6.16 1.05.16 1.05.66 2.9 3.86 7.65 4.55 8.65.05.05.1.03.1.03a.1.1 0 00.06-.1c1.06-10.6-1.11-13.42-1.11-13.42-.32.02-1.19.23-1.19.23zm8.299 2.27s-.49-1.8-2.44-2.28c0 0-.57-.14-1.17-.22 0 0-2.18 2.81-1.12 13.43.01.07.06.08.06.08.07.03.1-.03.1-.03.72-1.03 3.9-5.76 4.55-8.64 0 0 .36-1.4.02-2.34zm-2.92 13.07s-.07 0-.09.05c0 0-.01.07.03.1.7.51 2.85 2 3.88 2.3 0 0 .16.05.43.06h.14c.69-.02 1.9-.37 3-2.26l-7.4-.25zm7.83-8.41c.14-2.06-1.94-3.97-1.94-3.98 0 0-3.85 4.66-6.67 10.8 0 0-.03.08.02.13l.04.01h.06c1.06-.53 5.46-2.77 7.28-4.54 0 0 1.15-.93 1.21-2.42zm1.52 2.14s-6.28 3.37-9.52 5.55c0 0-.05.04-.03.11 0 0 .03.06.07.06 1.16 0 5.56 0 5.67-.02 0 0 .57-.02 1.27-.29 0 0 1.56-.5 2.37-2.27 0 0 .73-1.45.17-3.14z"/>
+              </svg>
+              <div class="logo-label">Huawei</div>
+            </div>
+          </div>
+
+          <!-- Right: Content -->
+          <div class="card-content">
+            <div class="card-summary">
+              <div class="card-meta">
+                <span class="card-badge badge-huawei">已离职</span>
+                <span class="card-period">2022.10 — 2024.9</span>
+              </div>
+              <h2 class="card-org">华为技术有限公司</h2>
+              <div class="card-role-row">
+                <span class="card-dept">昇腾推理开发部</span>
+                <span class="card-divider">·</span>
+                <span class="card-role">推理开发工程师</span>
+              </div>
+              <div class="expand-hint" id="hw-hint">
+                <span>点击展开详情</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+
+            <!-- Expanded Detail -->
+            <div class="card-detail" id="hw-detail">
+              <div class="detail-divider"></div>
+              <div class="detail-tags">
+                <span class="tag tag-huawei">C++</span>
+                <span class="tag tag-huawei">Python</span>
+                <span class="tag tag-huawei">昇腾 NPU</span>
+                <span class="tag tag-huawei">模型推理</span>
+                <span class="tag tag-huawei">TensorRT</span>
+              </div>
+              <ul class="detail-list">
+                <li>负责昇腾 AI 推理引擎（AscendCL / MindSpore Lite）核心模块开发与性能调优，支撑视觉、NLP 等多类模型的高性能部署。</li>
+                <li>主导自动量化工具链建设，实现 INT8 / FP16 混合量化，在多款边端芯片上吞吐提升 40%+ 。</li>
+                <li>参与 Atlas 系列推理硬件的算子库（Custom Op）设计与 TOPI 接口封装。</li>
+                <li>配合生态团队完成 PyTorch / ONNX 模型在昇腾平台的适配验证与文档沉淀。</li>
+              </ul>
+              <p class="detail-note">📍 杭州市 · 滨江区 · 杭州华为企业通信技术有限公司</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ZJU Education -->
+      <div class="timeline-item" id="exp-edu">
+        <div class="timeline-dot dot-zju"></div>
+        <div class="exp-detail-card card-zju glass" onclick="toggleDetail('edu')">
+          <!-- Left: Logo Column -->
+          <div class="card-logo-col col-zju">
+            <div class="logo-wrapper">
+              <img src="/logos/zju.svg" alt="浙江大学" class="brand-logo brand-logo-img brand-logo-zju" />
+              <div class="logo-label">ZJU</div>
+            </div>
+          </div>
+
+          <!-- Right: Content -->
+          <div class="card-content">
+            <div class="card-summary">
+              <div class="card-meta">
+                <span class="card-badge badge-zju">已毕业</span>
+                <span class="card-period">2015.9 — 2022.9</span>
+              </div>
+              <h2 class="card-org">浙江大学</h2>
+              <div class="card-role-row">
+                <span class="card-dept">信息与电子工程学院（信电学院）</span>
+              </div>
+              <div class="expand-hint" id="edu-hint">
+                <span>点击展开详情</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+
+            <!-- Expanded Detail -->
+            <div class="card-detail" id="edu-detail">
+              <div class="detail-divider"></div>
+              <div class="detail-sub-items">
+                <div class="edu-item">
+                  <span class="edu-degree edu-degree-bs">本科</span>
+                  <div class="edu-info">
+                    <strong>信息工程</strong>
+                    <span>2015.9 — 2019.6 · 学士学位</span>
+                  </div>
+                </div>
+                <div class="edu-item">
+                  <span class="edu-degree edu-degree-ms">硕士</span>
+                  <div class="edu-info">
+                    <strong>电子与通信工程</strong>
+                    <span>2019.9 — 2022.9 · 工程硕士学位</span>
+                  </div>
+                </div>
+              </div>
+              <ul class="detail-list">
+                <li>本科期间主修信号处理、数字电路与通信原理，GPA 优良，多次获得校级奖学金。</li>
+                <li>硕士阶段聚焦深度学习模型压缩与嵌入式部署方向，完成论文《面向边端推理的轻量化神经网络优化》。</li>
+                <li>参与实验室 FPGA 原型验证工作，积累硬件协同推理经验，为后续工程实践奠定基础。</li>
+              </ul>
+              <p class="detail-note">📍 浙江省 杭州市 · 浙大紫金港校区 - 玉泉校区</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /timeline-container -->
+  </div>
+</Layout>
+
+<style>
+  .experience-page {
+    padding: 2rem 0 4rem;
+  }
+
+  /* Page Header */
+  .exp-header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+  }
+
+  .page-title {
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-subtitle {
+    font-size: 1.05rem;
+    color: hsl(var(--text-muted));
+    font-style: italic;
+    letter-spacing: 0.03em;
+  }
+
+  /* ==================
+     TIMELINE LAYOUT
+  ==================== */
+  .timeline-container {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Vertical line running through dots */
+  .timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 24px;
+    bottom: 24px;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      rgba(22, 119, 255, 0.8),
+      rgba(199, 0, 11, 0.8),
+      rgba(0, 63, 136, 0.8)
+    );
+    border-radius: 1px;
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-left: 56px;
+    margin-bottom: 2.5rem;
+  }
+
+  .timeline-item:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Timeline Dot */
+  .timeline-dot {
+    position: absolute;
+    left: 10px;
+    top: 28px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid hsl(var(--bg-color));
+    z-index: 1;
+  }
+
+  .dot-ant {
+    background: #1677FF;
+    box-shadow: 0 0 12px rgba(22, 119, 255, 0.6);
+  }
+
+  .dot-huawei {
+    background: #C7000B;
+    box-shadow: 0 0 12px rgba(199, 0, 11, 0.6);
+  }
+
+  .dot-zju {
+    background: #003f8a;
+    box-shadow: 0 0 12px rgba(0, 63, 136, 0.6);
+  }
+
+  /* ==================
+     EXPERIENCE DETAIL CARD
+  ==================== */
+  .exp-detail-card {
+    display: flex;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.35s ease;
+    border: 1px solid transparent;
+  }
+
+  .exp-detail-card:hover {
+    transform: translateX(4px);
+  }
+
+  /* Ant Group */
+  .card-ant {
+    border-color: rgba(22, 119, 255, 0.25);
+  }
+
+  .card-ant:hover {
+    border-color: rgba(22, 119, 255, 0.5);
+    box-shadow: 0 8px 32px -8px rgba(22, 119, 255, 0.25);
+  }
+
+  /* Huawei */
+  .card-huawei {
+    border-color: rgba(199, 0, 11, 0.25);
+  }
+
+  .card-huawei:hover {
+    border-color: rgba(199, 0, 11, 0.5);
+    box-shadow: 0 8px 32px -8px rgba(199, 0, 11, 0.25);
+  }
+
+  /* ZJU */
+  .card-zju {
+    border-color: rgba(0, 63, 136, 0.25);
+  }
+
+  .card-zju:hover {
+    border-color: rgba(0, 63, 136, 0.5);
+    box-shadow: 0 8px 32px -8px rgba(0, 63, 136, 0.25);
+  }
+
+  /* Left Logo Column */
+  .card-logo-col {
+    width: 100px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0.8rem;
+  }
+
+  .col-ant {
+    background: linear-gradient(160deg, #1677FF, #0958d9);
+  }
+
+  .col-huawei {
+    background: linear-gradient(160deg, #C7000B, #8b0000);
+  }
+
+  .col-zju {
+    background: linear-gradient(160deg, #003f8a, #001a4f);
+  }
+
+  .logo-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .brand-logo {
+    width: 44px;
+    height: 44px;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+  }
+
+  /* img-based logos: same size, preserve aspect ratio */
+  .brand-logo-img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    /* Invert dark SVG paths to white so they show on colored background columns */
+    filter: brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+  }
+
+  /* ZJU SVG is dark blue – invert to white on the dark blue col-zju background */
+  .brand-logo-zju {
+    filter: brightness(0) invert(1) drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+  }
+
+  .logo-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Right Content Column */
+  .card-content {
+    flex: 1;
+    padding: 1.5rem 1.8rem;
+    min-width: 0;
+  }
+
+  .card-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .card-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-ant {
+    background: rgba(22, 119, 255, 0.15);
+    color: #4d94ff;
+    border: 1px solid rgba(22, 119, 255, 0.3);
+  }
+
+  .badge-huawei {
+    background: rgba(199, 0, 11, 0.12);
+    color: #e84c4c;
+    border: 1px solid rgba(199, 0, 11, 0.3);
+  }
+
+  .badge-zju {
+    background: rgba(0, 63, 136, 0.15);
+    color: #5b9bd5;
+    border: 1px solid rgba(0, 63, 136, 0.3);
+  }
+
+  .card-period {
+    font-size: 0.82rem;
+    color: hsl(var(--text-muted));
+  }
+
+  .card-org {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0;
+    color: hsl(var(--text-primary));
+  }
+
+  .card-role-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .card-dept {
+    font-size: 0.88rem;
+    color: hsl(var(--text-secondary));
+  }
+
+  .card-divider {
+    color: hsl(var(--text-muted));
+  }
+
+  .card-role {
+    font-size: 0.88rem;
+    color: hsl(var(--text-secondary));
+    font-weight: 600;
+  }
+
+  .expand-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+    color: hsl(var(--text-muted));
+    transition: color 0.25s ease;
+    user-select: none;
+  }
+
+  .exp-detail-card:hover .expand-hint {
+    color: hsl(var(--text-secondary));
+  }
+
+  /* Expanded Detail Panel */
+  .card-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+    opacity: 0;
+  }
+
+  .card-detail.open {
+    max-height: 500px;
+    opacity: 1;
+  }
+
+  .detail-divider {
+    height: 1px;
+    background: hsla(var(--border-glass));
+    margin: 1rem 0;
+  }
+
+  /* Tags */
+  .detail-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+  }
+
+  .tag-ant {
+    background: rgba(22, 119, 255, 0.12);
+    color: #5b9eff;
+    border: 1px solid rgba(22, 119, 255, 0.25);
+  }
+
+  .tag-huawei {
+    background: rgba(199, 0, 11, 0.12);
+    color: #e84c4c;
+    border: 1px solid rgba(199, 0, 11, 0.25);
+  }
+
+  .tag-zju {
+    background: rgba(0, 63, 136, 0.12);
+    color: #5b9bd5;
+    border: 1px solid rgba(0, 63, 136, 0.25);
+  }
+
+  /* Detail List */
+  .detail-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .detail-list li {
+    font-size: 0.88rem;
+    color: hsl(var(--text-secondary));
+    line-height: 1.6;
+    padding-left: 1.2rem;
+    position: relative;
+  }
+
+  .detail-list li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: hsl(var(--text-muted));
+    font-weight: 700;
+  }
+
+  .detail-note {
+    font-size: 0.78rem;
+    color: hsl(var(--text-muted));
+    padding-top: 0.5rem;
+  }
+
+  /* Education sub-items */
+  .detail-sub-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-bottom: 1rem;
+  }
+
+  .edu-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .edu-degree {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .edu-degree-bs {
+    background: rgba(176, 31, 36, 0.15);
+    color: #c84b50;
+    border: 1px solid rgba(176, 31, 36, 0.3);
+  }
+
+  .edu-degree-ms {
+    background: rgba(0, 63, 136, 0.15);
+    color: #5b9bd5;
+    border: 1px solid rgba(0, 63, 136, 0.3);
+  }
+
+  .edu-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .edu-info strong {
+    font-size: 0.92rem;
+    color: hsl(var(--text-primary));
+    font-weight: 600;
+  }
+
+  .edu-info span {
+    font-size: 0.8rem;
+    color: hsl(var(--text-muted));
+  }
+
+  /* ==================
+     MOBILE
+  ==================== */
+  @media (max-width: 640px) {
+    .timeline-container::before {
+      left: 14px;
+    }
+
+    .timeline-item {
+      padding-left: 44px;
+    }
+
+    .timeline-dot {
+      left: 4px;
+    }
+
+    .card-logo-col {
+      width: 70px;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+    }
+
+    .logo-label {
+      display: none;
+    }
+
+    .card-content {
+      padding: 1.2rem 1.2rem;
+    }
+
+    .card-org {
+      font-size: 1.15rem;
+    }
+  }
+</style>
+
+<script>
+  function toggleDetail(id: string) {
+    const detail = document.getElementById(`${id}-detail`);
+    const hint = document.getElementById(`${id}-hint`);
+    if (!detail) return;
+    const isOpen = detail.classList.contains('open');
+    detail.classList.toggle('open', !isOpen);
+    if (hint) {
+      const svg = hint.querySelector('svg');
+      if (svg) {
+        svg.style.transform = isOpen ? '' : 'rotate(180deg)';
+        svg.style.transition = 'transform 0.3s ease';
+      }
+      const span = hint.querySelector('span');
+      if (span) span.textContent = isOpen ? '点击展开详情' : '收起详情';
+    }
+  }
+
+  // Expose to onclick
+  (window as any).toggleDetail = toggleDetail;
+</script>

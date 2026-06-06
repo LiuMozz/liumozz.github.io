@@ -1,48 +1,9 @@
 ---
-interface Song {
-  id: string;
-  title: string;
-  artist: string;
-  url: string;
-  cover: string;
-  lyrics: { time: number; text: string }[];
-}
+import { songs, type Song } from '../data/songs';
 
-const songs: Song[] = [
-  {
-    id: "1",
-    title: "Lofi Coding Dream",
-    artist: "LiuMozz SoundLab",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-    cover: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=300&auto=format&fit=crop&q=80",
-    lyrics: [
-      { time: 0, text: "🎵 [氛围纯音乐启动] 🎵" },
-      { time: 5, text: "霓虹的光影穿透玻璃窗..." },
-      { time: 12, text: "指尖在机械键盘上飞舞跳跃..." },
-      { time: 20, text: "每一行代码都是一首未完的歌..." },
-      { time: 28, text: "让思路在数字的世界里静静流淌..." },
-      { time: 36, text: "构建我们最初梦想的避难所..." },
-      { time: 45, text: "⚡ [音符在虚空中绽放] ⚡" },
-      { time: 60, text: "在极简中寻求极致的宁静..." }
-    ]
-  },
-  {
-    id: "2",
-    title: "Cyberpunk Midnight Pulse",
-    artist: "Neon Matrix",
-    url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-    cover: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&auto=format&fit=crop&q=80",
-    lyrics: [
-      { time: 0, text: "⚡ [电子合成器前奏] ⚡" },
-      { time: 10, text: "穿梭于高耸的霓虹电网之间..." },
-      { time: 18, text: "数据洪流在黑夜中脉动..." },
-      { time: 26, text: "意识脱离重力的枷锁..." },
-      { time: 35, text: "打破规则，重构未来..." },
-      { time: 48, text: "🎹 [合成器独奏阶段] 🎹" },
-      { time: 65, text: "与硅基生命在虚拟边缘相遇..." }
-    ]
-  }
-];
+// Separate the public and original lists
+const publicSongs = songs.filter(s => s.type === 'public');
+const originalSongs = songs.filter(s => s.type === 'original');
 ---
 
 <div class="music-player-container glass" id="custom-music-player">
@@ -62,20 +23,22 @@ const songs: Song[] = [
   </div>
 
   <div class="player-right">
-    <!-- Song Info -->
-    <div class="song-meta">
-      <h2 class="song-title text-gradient-purple" id="player-song-title">{songs[0].title}</h2>
-      <p class="song-artist" id="player-song-artist">{songs[0].artist}</p>
+    <!-- Song Info & BGM Button Header -->
+    <div class="song-meta-wrapper">
+      <div class="song-meta">
+        <h2 class="song-title text-gradient-purple" id="player-song-title">{songs[0].title}</h2>
+        <p class="song-artist" id="player-song-artist">{songs[0].artist}</p>
+      </div>
+      <button class="btn-background glass" id="btn-background" aria-label="Set Homepage BGM">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>Background</span>
+      </button>
     </div>
 
     <!-- Lyrics Display -->
     <div class="lyrics-container" id="lyrics-scroll">
       <div class="lyrics-wrapper" id="lyrics-content">
-        {songs[0].lyrics.map((lyric, idx) => (
-          <p class="lyric-line" data-time={lyric.time} class={idx === 0 ? "active" : ""}>
-            {lyric.text}
-          </p>
-        ))}
+        <p class="lyric-line active">正在加载歌词...</p>
       </div>
     </div>
 
@@ -112,28 +75,70 @@ const songs: Song[] = [
       </div>
     </div>
 
-    <!-- Play List Selection -->
-    <div class="playlist-section">
-      <h3 class="playlist-header">📂 播放歌单</h3>
-      <div class="playlist-items">
-        {songs.map((song, idx) => (
-          <button 
-            class={`playlist-item glass ${idx === 0 ? "playing" : ""}`} 
-            data-id={song.id}
-            data-title={song.title}
-            data-artist={song.artist}
-            data-url={song.url}
-            data-cover={song.cover}
-            data-lyrics={JSON.stringify(song.lyrics)}
-          >
-            <img src={song.cover} alt="Cover" class="playlist-cover" />
-            <div class="playlist-meta">
-              <span class="playlist-title">{song.title}</span>
-              <span class="playlist-artist">{song.artist}</span>
-            </div>
-            <span class="playlist-status-icon">▶</span>
-          </button>
-        ))}
+    <!-- Play List Selection: Divided into 2 Columns -->
+    <div class="playlist-section-two-cols">
+      <!-- Left Column: 公网音乐 -->
+      <div class="playlist-col">
+        <h3 class="playlist-header">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" class="icon-globe"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <span>公网音乐</span>
+        </h3>
+        <div class="playlist-items" id="playlist-public">
+          {publicSongs.map((song, idx) => (
+            <button 
+              class={`playlist-item glass ${idx === 0 ? "playing" : ""}`} 
+              data-id={song.id}
+              data-title={song.title}
+              data-artist={song.artist}
+              data-url={song.url}
+              data-cover={song.cover}
+              data-lyrics-url={song.lyricsUrl}
+            >
+              <img src={song.cover} alt="Cover" class="playlist-cover" />
+              <div class="playlist-meta">
+                <span class="playlist-title">{song.title}</span>
+                <span class="playlist-artist">{song.artist}</span>
+              </div>
+              <span class="bgm-tag hidden">BGM</span>
+              <span class="playlist-status-icon">▶</span>
+            </button>
+          ))}
+        </div>
+        {publicSongs.length > 5 && (
+          <button class="btn-expand glass" id="btn-expand-public" data-target="playlist-public">展开更多 📂</button>
+        )}
+      </div>
+
+      <!-- Right Column: 原创音乐 -->
+      <div class="playlist-col">
+        <h3 class="playlist-header">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" class="icon-sparkle"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>原创音乐</span>
+        </h3>
+        <div class="playlist-items" id="playlist-original">
+          {originalSongs.map((song) => (
+            <button 
+              class="playlist-item glass" 
+              data-id={song.id}
+              data-title={song.title}
+              data-artist={song.artist}
+              data-url={song.url}
+              data-cover={song.cover}
+              data-lyrics-url={song.lyricsUrl}
+            >
+              <img src={song.cover} alt="Cover" class="playlist-cover" />
+              <div class="playlist-meta">
+                <span class="playlist-title">{song.title}</span>
+                <span class="playlist-artist">{song.artist}</span>
+              </div>
+              <span class="bgm-tag hidden">BGM</span>
+              <span class="playlist-status-icon">▶</span>
+            </button>
+          ))}
+        </div>
+        {originalSongs.length > 5 && (
+          <button class="btn-expand glass" id="btn-expand-original" data-target="playlist-original">展开更多 📂</button>
+        )}
       </div>
     </div>
   </div>
@@ -142,7 +147,7 @@ const songs: Song[] = [
 <style>
   .music-player-container {
     display: flex;
-    max-width: 1000px;
+    max-width: 1100px;
     width: 100%;
     margin: 2rem auto;
     padding: 2.5rem;
@@ -249,8 +254,17 @@ const songs: Song[] = [
     justify-content: space-between;
   }
 
-  .song-meta {
+  /* Song info & BGM button wrapper */
+  .song-meta-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .song-meta {
+    flex: 1;
   }
 
   .song-title {
@@ -262,6 +276,51 @@ const songs: Song[] = [
     color: hsl(var(--text-secondary));
     font-size: 0.95rem;
     font-weight: 500;
+  }
+
+  .btn-background {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 20px;
+    border: 1px solid hsla(var(--border-glass));
+    background: rgba(255, 255, 255, 0.02);
+    color: hsl(var(--text-muted));
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+  }
+
+  .btn-background svg {
+    color: hsl(var(--text-muted));
+    transition: transform 0.3s ease;
+  }
+
+  .btn-background:hover {
+    color: #ffffff;
+    border-color: hsla(var(--neon-purple), 0.4);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .btn-background:hover svg {
+    color: #ffffff;
+  }
+
+  .btn-background.active {
+    background: hsla(var(--neon-purple), 0.15);
+    border-color: hsl(var(--neon-purple));
+    color: hsl(var(--neon-purple));
+    box-shadow: 0 0 12px hsla(var(--neon-purple), 0.4);
+    text-shadow: 0 0 5px hsla(var(--neon-purple), 0.3);
+  }
+
+  .btn-background.active svg {
+    color: hsl(var(--neon-purple));
+    transform: rotate(180deg);
   }
 
   /* Lyrics Scroller */
@@ -418,22 +477,66 @@ const songs: Song[] = [
     color: hsl(var(--text-muted));
   }
 
-  /* Playlist style */
-  .playlist-section {
+  /* Two Column Playlist Section Layout */
+  .playlist-section-two-cols {
+    display: flex;
+    gap: 2.5rem;
+    margin-top: 1.5rem;
     border-top: 1px solid hsla(var(--border-glass));
     padding-top: 1.5rem;
   }
 
+  .playlist-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
   .playlist-header {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.15rem;
+    margin-bottom: 1.2rem;
     color: #ffffff;
+    font-weight: 700;
+  }
+
+  .playlist-header svg {
+    color: hsl(var(--neon-purple));
+    filter: drop-shadow(0 0 5px hsla(var(--neon-purple), 0.5));
   }
 
   .playlist-items {
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
+    overflow: hidden;
+    max-height: 270px; /* Standard: exactly 5 items */
+    transition: max-height 0.4s ease-in-out;
+  }
+
+  .playlist-items.expanded {
+    max-height: 1000px;
+  }
+
+  .btn-expand {
+    margin-top: 0.8rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid hsla(var(--border-glass));
+    cursor: pointer;
+    background: rgba(255,255,255,0.02);
+    transition: var(--transition-smooth);
+    align-self: center;
+    color: hsl(var(--text-secondary));
+  }
+
+  .btn-expand:hover {
+    background: rgba(255,255,255,0.06);
+    color: #ffffff;
+    border-color: hsla(var(--neon-purple), 0.4);
   }
 
   .playlist-item {
@@ -442,10 +545,11 @@ const songs: Song[] = [
     padding: 0.6rem 1rem;
     background: rgba(255,255,255,0.01);
     border-radius: var(--radius-sm);
-    border-color: transparent;
+    border: 1px solid transparent;
     cursor: pointer;
     text-align: left;
     width: 100%;
+    transition: var(--transition-smooth);
   }
 
   .playlist-item:hover {
@@ -487,9 +591,24 @@ const songs: Song[] = [
     color: hsl(var(--text-muted));
   }
 
+  /* BGM Tag in Playlist item */
+  .bgm-tag {
+    background: hsla(var(--neon-purple), 0.2);
+    border: 1px solid hsl(var(--neon-purple));
+    color: hsl(var(--neon-purple));
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+    text-shadow: 0 0 3px hsla(var(--neon-purple), 0.5);
+    flex-shrink: 0;
+  }
+
   .playlist-status-icon {
     font-size: 0.9rem;
     color: hsl(var(--text-muted));
+    flex-shrink: 0;
   }
 
   .playlist-item.playing .playlist-status-icon {
@@ -507,10 +626,17 @@ const songs: Song[] = [
     .player-left {
       width: 100%;
     }
+
+    .playlist-section-two-cols {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
   }
 </style>
 
 <script>
+  import { songs } from '../data/songs';
+
   // Script bindings for HTML5 Audio Player
   const audio = document.getElementById('main-audio') as HTMLAudioElement;
   const vinyl = document.getElementById('player-vinyl');
@@ -534,17 +660,11 @@ const songs: Song[] = [
   const playlistItems = document.querySelectorAll('.playlist-item');
   const btnPrev = document.getElementById('btn-prev');
   const btnNext = document.getElementById('btn-next');
+  const btnBGM = document.getElementById('btn-background');
 
-  let activeSongIndex = 0;
+  let activeSongId = songs[0].id;
   let activeSongLyrics: { time: number; text: string }[] = [];
-
-  // Parse lyrics from first song
-  if (playlistItems.length > 0) {
-    const defaultData = playlistItems[0].getAttribute('data-lyrics');
-    if (defaultData) {
-      activeSongLyrics = JSON.parse(defaultData);
-    }
-  }
+  let currentBGMId = localStorage.getItem('backgroundSongId') || '1';
 
   // Format time (e.g. 125 -> 2:05)
   function formatTime(secs: number) {
@@ -607,11 +727,64 @@ const songs: Song[] = [
     });
   }
 
+  // Parse LRC format to lyrics array
+  function parseLRC(lrcText: string): { time: number; text: string }[] {
+    const lines = lrcText.split('\n');
+    const result: { time: number; text: string }[] = [];
+    const timeReg = /\[(\d+):(\d+(?:\.\d+)?)\]/g;
+    
+    for (let line of lines) {
+      line = line.trim();
+      if (!line) continue;
+      
+      const matches = [...line.matchAll(timeReg)];
+      if (matches.length === 0) continue;
+      
+      const text = line.replace(timeReg, '').trim();
+      for (const match of matches) {
+        const min = parseInt(match[1], 10);
+        const sec = parseFloat(match[2]);
+        const time = min * 60 + sec;
+        result.push({ time, text });
+      }
+    }
+    
+    result.sort((a, b) => a.time - b.time);
+    return result;
+  }
+
+  // Load lyrics from static URL
+  async function loadLyrics(lyricsUrl: string) {
+    if (!lyricsUrl) {
+      return [{ time: 0, text: "暂无歌词" }];
+    }
+    try {
+      const res = await fetch(lyricsUrl);
+      if (!res.ok) throw new Error("Failed to load lyrics");
+      const text = await res.text();
+      return parseLRC(text);
+    } catch (err) {
+      console.error("Error loading lyrics:", err);
+      return [{ time: 0, text: "歌词加载失败" }];
+    }
+  }
+
+  // Render lyrics elements
+  function renderLyrics(lyrics: { time: number; text: string }[]) {
+    if (lyricsContent) {
+      lyricsContent.innerHTML = lyrics.map((lyric, idx) => `
+        <p class="lyric-line ${idx === 0 ? 'active' : ''}" data-time="${lyric.time}">
+          ${lyric.text}
+        </p>
+      `).join('');
+      lyricsContent.style.transform = 'translateY(40px)';
+    }
+  }
+
   // Lyrics tracker
   function updateLyrics(time: number) {
     if (!lyricsContent || activeSongLyrics.length === 0) return;
     
-    // Find active lyric line index
     let activeIndex = -1;
     for (let i = 0; i < activeSongLyrics.length; i++) {
       if (time >= activeSongLyrics[i].time) {
@@ -626,7 +799,6 @@ const songs: Song[] = [
       lines.forEach((line, idx) => {
         if (idx === activeIndex) {
           line.classList.add('active');
-          // Smooth scroll lyrics center
           const containerHeight = lyricsScroll?.clientHeight || 120;
           const lineOffset = (line as HTMLElement).offsetTop;
           const lineHeight = (line as HTMLElement).clientHeight;
@@ -640,40 +812,69 @@ const songs: Song[] = [
     }
   }
 
-  // Song switching logic
-  function switchSong(index: number) {
-    if (index < 0 || index >= playlistItems.length) return;
-    activeSongIndex = index;
-    const item = playlistItems[index] as HTMLElement;
-    const title = item.getAttribute('data-title') || '';
-    const artist = item.getAttribute('data-artist') || '';
-    const url = item.getAttribute('data-url') || '';
-    const cover = item.getAttribute('data-cover') || '';
-    const rawLyrics = item.getAttribute('data-lyrics') || '[]';
+  // BGM UI Tag synchronizer
+  function updateBGMUI() {
+    // Check tags on list
+    playlistItems.forEach(item => {
+      const songId = item.getAttribute('data-id');
+      const bgmTag = item.querySelector('.bgm-tag');
+      if (bgmTag) {
+        if (songId === currentBGMId) {
+          bgmTag.classList.remove('hidden');
+        } else {
+          bgmTag.classList.add('hidden');
+        }
+      }
+    });
 
-    // Update active highlight class
-    playlistItems.forEach(pi => pi.classList.remove('playing'));
-    item.classList.add('playing');
+    // Check header button state
+    if (btnBGM) {
+      if (activeSongId === currentBGMId) {
+        btnBGM.classList.add('active');
+      } else {
+        btnBGM.classList.remove('active');
+      }
+    }
+  }
+
+  // Song switching logic by ID
+  async function switchSong(id: string) {
+    const song = songs.find(s => s.id === id);
+    if (!song) return;
+    
+    activeSongId = id;
+
+    // Highlight playing song and prepend to top of its parent list
+    playlistItems.forEach(item => {
+      const itemId = item.getAttribute('data-id');
+      if (itemId === id) {
+        item.classList.add('playing');
+        const parent = item.parentElement;
+        if (parent) {
+          parent.prepend(item);
+        }
+      } else {
+        item.classList.remove('playing');
+      }
+    });
 
     // Update UI elements
-    if (songTitle) songTitle.innerText = title;
-    if (songArtist) songArtist.innerText = artist;
-    if (coverArt) coverArt.style.backgroundImage = `url('${cover}')`;
+    if (songTitle) songTitle.innerText = song.title;
+    if (songArtist) songArtist.innerText = song.artist;
+    if (coverArt) coverArt.style.backgroundImage = `url('${song.cover}')`;
 
-    // Render lyrics in scroller
-    activeSongLyrics = JSON.parse(rawLyrics);
+    // Show loading state
     if (lyricsContent) {
-      lyricsContent.innerHTML = activeSongLyrics.map((lyric, idx) => `
-        <p class="lyric-line ${idx === 0 ? 'active' : ''}" data-time="${lyric.time}">
-          ${lyric.text}
-        </p>
-      `).join('');
-      lyricsContent.style.transform = 'translateY(40px)';
+      lyricsContent.innerHTML = '<p class="lyric-line active">正在加载歌词...</p>';
     }
+
+    // Load lyrics from LRC URL
+    activeSongLyrics = await loadLyrics(song.lyricsUrl);
+    renderLyrics(activeSongLyrics);
 
     // Play audio
     if (audio) {
-      audio.src = url;
+      audio.src = song.url;
       audio.load();
       // Auto play song on switch
       audio.play().then(() => {
@@ -688,29 +889,75 @@ const songs: Song[] = [
         vinylContainer?.classList.remove('playing');
       });
     }
+
+    // Sync BGM UI states
+    updateBGMUI();
+  }
+
+  // Play next/prev track in catalog order
+  function playNext() {
+    const currentIndex = songs.findIndex(s => s.id === activeSongId);
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= songs.length) nextIndex = 0;
+    switchSong(songs[nextIndex].id);
   }
 
   function playPrev() {
-    let prevIndex = activeSongIndex - 1;
-    if (prevIndex < 0) prevIndex = playlistItems.length - 1;
-    switchSong(prevIndex);
-  }
-
-  function playNext() {
-    let nextIndex = activeSongIndex + 1;
-    if (nextIndex >= playlistItems.length) nextIndex = 0;
-    switchSong(nextIndex);
+    const currentIndex = songs.findIndex(s => s.id === activeSongId);
+    let prevIndex = currentIndex - 1;
+    if (prevIndex < 0) prevIndex = songs.length - 1;
+    switchSong(songs[prevIndex].id);
   }
 
   if (btnPrev) btnPrev.addEventListener('click', playPrev);
   if (btnNext) btnNext.addEventListener('click', playNext);
 
   // Bind click selection on playlist
-  playlistItems.forEach((item, idx) => {
+  playlistItems.forEach(item => {
     item.addEventListener('click', () => {
-      switchSong(idx);
+      const id = item.getAttribute('data-id');
+      if (id) switchSong(id);
     });
   });
+
+  // Bind Background button click handler
+  if (btnBGM) {
+    btnBGM.addEventListener('click', () => {
+      currentBGMId = activeSongId;
+      localStorage.setItem('backgroundSongId', currentBGMId);
+      updateBGMUI();
+    });
+  }
+
+  // Bind Expand / Collapse toggles
+  const expandBtns = document.querySelectorAll('.btn-expand');
+  expandBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      if (targetId) {
+        const list = document.getElementById(targetId);
+        if (list) {
+          list.classList.toggle('expanded');
+          const isExpanded = list.classList.contains('expanded');
+          btn.innerHTML = isExpanded ? '收起歌单 📁' : '展开更多 📂';
+        }
+      }
+    });
+  });
+
+  // Initialize page on load
+  if (playlistItems.length > 0) {
+    // Load first song lyrics
+    const defaultUrl = playlistItems[0].getAttribute('data-lyrics-url');
+    if (defaultUrl) {
+      loadLyrics(defaultUrl).then(lyrics => {
+        activeSongLyrics = lyrics;
+        renderLyrics(lyrics);
+      });
+    }
+    // Sync Background BGM state
+    updateBGMUI();
+  }
 
   // Simulated Glowing Waveform Visualizer
   const canvas = document.getElementById('waveform-canvas') as HTMLCanvasElement;
@@ -722,7 +969,7 @@ const songs: Song[] = [
     ctx = canvas.getContext('2d');
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    drawWaveformStatic(); // Initial static display
+    drawWaveformStatic();
   }
 
   function resizeCanvas() {
@@ -737,7 +984,7 @@ const songs: Song[] = [
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const barsCount = 40;
     const barWidth = canvas.width / barsCount - 2;
-    ctx.fillStyle = 'hsla(280, 100%, 60%, 0.2)'; // Faded purple
+    ctx.fillStyle = 'hsla(280, 100%, 60%, 0.2)';
     for (let i = 0; i < barsCount; i++) {
       const val = 10 + Math.sin(i * 0.3) * 15;
       ctx.fillRect(i * (barWidth + 2), canvas.height - val, barWidth, val);
@@ -765,29 +1012,21 @@ const songs: Song[] = [
     const time = Date.now() * 0.005;
 
     for (let i = 0; i < barsCount; i++) {
-      // Calculate dynamic bar heights using noise-simulating sin functions
       let heightVal = 10 + Math.abs(Math.sin(i * 0.4 + time) * 30);
       heightVal += Math.abs(Math.cos(i * 0.1 - time * 1.5) * 15);
       
-      // Scale height down if audio is playing a slow track (simulation)
       if (audio && audio.paused) {
         heightVal = 5;
       }
       
-      // Color gradient transition cyan -> purple
       const gradient = ctx.createLinearGradient(0, canvas.height - heightVal, 0, canvas.height);
-      gradient.addColorStop(0, 'hsl(185, 100%, 50%)'); // Cyan top
-      gradient.addColorStop(1, 'hsl(280, 100%, 60%)'); // Purple base
+      gradient.addColorStop(0, 'hsl(185, 100%, 50%)');
+      gradient.addColorStop(1, 'hsl(280, 100%, 60%)');
       
       ctx.fillStyle = gradient;
-      
-      // Draw neon rounded glow shadow
       ctx.shadowBlur = 8;
       ctx.shadowColor = 'hsla(185, 100%, 50%, 0.5)';
-      
       ctx.fillRect(i * (barWidth + 3), canvas.height - heightVal, barWidth, heightVal);
-      
-      // Reset shadow blur
       ctx.shadowBlur = 0;
     }
 

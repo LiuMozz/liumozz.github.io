@@ -28,27 +28,36 @@ import BentoCard from './BentoCard.astro';
   </BentoCard>
 
   <!-- Music Space Card (Vertical long) -->
-  <BentoCard 
-    title="🎵 音乐屋" 
-    subtitle="黑胶唱片律动，带上耳机，在音符里寻找片刻宁静" 
-    href="/music" 
-    accent="purple" 
-    class="card-music"
-  >
-    <div class="vinyl-mockup">
-      <div class="vinyl-record">
-        <div class="vinyl-label"></div>
+  <div class="card-music-container">
+    <BentoCard 
+      title="🎵 音乐屋" 
+      subtitle="黑胶唱片律动，带上耳机，在音符里寻找片刻宁静" 
+      href="/music" 
+      accent="purple" 
+      class="card-music"
+    >
+      <div class="vinyl-mockup">
+        <div class="vinyl-record" id="home-vinyl-record">
+          <div class="vinyl-label"></div>
+        </div>
+        <div class="vinyl-arm" id="home-vinyl-arm"></div>
+        <div class="music-wave" id="home-music-wave">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
       </div>
-      <div class="vinyl-arm"></div>
-      <div class="music-wave">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </div>
-  </BentoCard>
+    </BentoCard>
+    <!-- BGM Play/Pause Button sits outside the BentoCard link wrapper -->
+    <button class="home-play-btn glass" id="home-bgm-play-btn" aria-label="Play BGM">
+      <svg class="icon-play" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+      <svg class="icon-pause hidden" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+    </button>
+    <!-- Hidden Audio BGM Player -->
+    <audio id="home-bgm-audio"></audio>
+  </div>
 
   <!-- Gaming Center Card -->
   <BentoCard 
@@ -110,9 +119,14 @@ import BentoCard from './BentoCard.astro';
     grid-column: span 2;
   }
 
-  .card-music {
+  .card-music-container {
     grid-column: span 1;
     grid-row: span 2;
+    height: 100%;
+    position: relative;
+  }
+
+  .card-music {
     height: 100%;
   }
 
@@ -206,6 +220,11 @@ import BentoCard from './BentoCard.astro';
     box-shadow: 0 10px 25px rgba(0,0,0,0.6);
     position: relative;
     animation: spin 12s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .vinyl-record.playing {
+    animation-play-state: running;
   }
 
   .vinyl-label {
@@ -225,10 +244,15 @@ import BentoCard from './BentoCard.astro';
     border-left: 3px solid #666;
     border-top: 3px solid #666;
     border-radius: 10px 0 0 0;
-    transform: rotate(20deg);
+    transform: rotate(5deg);
     transform-origin: top right;
     pointer-events: none;
     z-index: 2;
+    transition: transform 0.5s ease;
+  }
+
+  .vinyl-arm.playing {
+    transform: rotate(20deg);
   }
 
   .vinyl-arm::after {
@@ -257,7 +281,12 @@ import BentoCard from './BentoCard.astro';
     background: hsl(var(--neon-purple));
     border-radius: 3px;
     animation: pulse-wave 1.2s ease-in-out infinite alternate;
+    animation-play-state: paused;
     transform-origin: bottom;
+  }
+
+  .music-wave.playing span {
+    animation-play-state: running;
   }
 
   .music-wave span:nth-child(2) { animation-delay: 0.2s; }
@@ -354,4 +383,115 @@ import BentoCard from './BentoCard.astro';
       gap: 1rem;
     }
   }
+
+  /* Play button styling */
+  .home-play-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid hsla(var(--neon-purple), 0.3);
+    background: hsla(var(--neon-purple), 0.15);
+    color: hsl(var(--neon-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: var(--transition-bounce);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+
+  .home-play-btn:hover {
+    transform: scale(1.1);
+    background: hsla(var(--neon-purple), 0.35);
+    border-color: hsla(var(--neon-purple), 0.6);
+    box-shadow: 0 0 15px hsla(var(--neon-purple), 0.5);
+    color: #ffffff;
+  }
+
+  .home-play-btn svg {
+    pointer-events: none;
+  }
+  
+  .hidden {
+    display: none !important;
+  }
 </style>
+
+<script>
+  import { songs } from '../data/songs';
+
+  const audio = document.getElementById('home-bgm-audio') as HTMLAudioElement;
+  const playBtn = document.getElementById('home-bgm-play-btn');
+  const vinyl = document.getElementById('home-vinyl-record');
+  const vinylArm = document.getElementById('home-vinyl-arm');
+  const musicWave = document.getElementById('home-music-wave');
+
+  const iconPlay = playBtn?.querySelector('.icon-play');
+  const iconPause = playBtn?.querySelector('.icon-pause');
+
+  let isPlaying = false;
+
+  function toggleBGM() {
+    if (!audio) return;
+    
+    if (audio.paused) {
+      // Get the backgroundSongId from localStorage
+      const bgmId = localStorage.getItem('backgroundSongId') || '1';
+      const song = songs.find(s => s.id === bgmId) || songs[0];
+      
+      // If audio source is empty or changed, load it
+      const currentSrc = audio.getAttribute('src');
+      if (!currentSrc || !currentSrc.includes(song.url)) {
+        audio.src = song.url;
+        audio.load();
+      }
+      
+      audio.play().then(() => {
+        isPlaying = true;
+        updateUI();
+      }).catch(err => {
+        console.log("Audio play blocked:", err);
+      });
+    } else {
+      audio.pause();
+      isPlaying = false;
+      updateUI();
+    }
+  }
+
+  function updateUI() {
+    if (isPlaying) {
+      iconPlay?.classList.add('hidden');
+      iconPause?.classList.remove('hidden');
+      vinyl?.classList.add('playing');
+      vinylArm?.classList.add('playing');
+      musicWave?.classList.add('playing');
+    } else {
+      iconPlay?.classList.remove('hidden');
+      iconPause?.classList.add('hidden');
+      vinyl?.classList.remove('playing');
+      vinylArm?.classList.remove('playing');
+      musicWave?.classList.remove('playing');
+    }
+  }
+
+  if (playBtn) {
+    playBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation(); // Prevents navigating to /music
+      toggleBGM();
+    });
+  }
+
+  // Audio ended handler to reset UI
+  if (audio) {
+    audio.addEventListener('ended', () => {
+      isPlaying = false;
+      updateUI();
+    });
+  }
+</script>

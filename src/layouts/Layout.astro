@@ -56,6 +56,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://liumozz.
 					<li><a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>首页</a></li>
 					<li><a href="/posts" class={Astro.url.pathname.startsWith('/posts') ? 'active' : ''}>技术</a></li>
 					<li><a href="/music" class={Astro.url.pathname.startsWith('/music') ? 'active' : ''}>音乐</a></li>
+					<li><a href="/experience" class={Astro.url.pathname.startsWith('/experience') ? 'active' : ''}>经历</a></li>
 					<li><a href="/gaming" class={Astro.url.pathname.startsWith('/gaming') ? 'active' : ''}>游戏</a></li>
 					<li><a href="/travel" class={Astro.url.pathname.startsWith('/travel') ? 'active' : ''}>旅行</a></li>
 					<li><a href="/archives" class={Astro.url.pathname.startsWith('/archives') ? 'active' : ''}>归档</a></li>
