@@ -45,13 +45,13 @@ const originalSongs = songs.filter(s => s.type === 'original');
     <!-- Play Controls -->
     <div class="player-controls">
       <!-- HTML5 Audio -->
-      <audio id="main-audio" src={songs[0].url}></audio>
+      <audio id="main-audio" src={songs[0].url} transition:persist></audio>
       
       <!-- Progress Bar -->
       <div class="progress-bar-container">
         <span class="time-label" id="current-time">0:00</span>
         <input type="range" class="progress-slider" id="progress-bar" value="0" min="0" max="100" />
-        <span class="time-label" id="duration-time">0:00</span>
+        <span class="time-label" id="duration-time">--:--</span>
       </div>
       
       <!-- Buttons -->
@@ -637,66 +637,78 @@ const originalSongs = songs.filter(s => s.type === 'original');
 <script>
   import { songs } from '../data/songs';
 
-  // Script bindings for HTML5 Audio Player
-  const audio = document.getElementById('main-audio') as HTMLAudioElement;
-  const vinyl = document.getElementById('player-vinyl');
-  const vinylArm = document.getElementById('player-arm');
-  const vinylContainer = document.querySelector('.vinyl-container');
-  const btnPlay = document.getElementById('btn-play');
-  const iconPlay = document.querySelector('.icon-play');
-  const iconPause = document.querySelector('.icon-pause');
-  
-  const progressBar = document.getElementById('progress-bar') as HTMLInputElement;
-  const currentTimeLabel = document.getElementById('current-time');
-  const durationTimeLabel = document.getElementById('duration-time');
-  const volumeBar = document.getElementById('volume-bar') as HTMLInputElement;
-  
-  const songTitle = document.getElementById('player-song-title');
-  const songArtist = document.getElementById('player-song-artist');
-  const coverArt = document.getElementById('vinyl-cover-art');
-  const lyricsContent = document.getElementById('lyrics-content');
-  const lyricsScroll = document.getElementById('lyrics-scroll');
-  
-  const playlistItems = document.querySelectorAll('.playlist-item');
-  const btnPrev = document.getElementById('btn-prev');
-  const btnNext = document.getElementById('btn-next');
-  const btnBGM = document.getElementById('btn-background');
-
-  let activeSongId = songs[0].id;
-  let activeSongLyrics: { time: number; text: string }[] = [];
-  let currentBGMId = localStorage.getItem('backgroundSongId') || '1';
-
-  // Format time (e.g. 125 -> 2:05)
-  function formatTime(secs: number) {
-    const minutes = Math.floor(secs / 60);
-    const seconds = Math.floor(secs % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  }
-
-  // Play & Pause controls
-  function togglePlay() {
+  document.addEventListener('astro:page-load', () => {
+    // Script bindings for HTML5 Audio Player
+    const audio = document.getElementById('main-audio') as HTMLAudioElement;
     if (!audio) return;
-    if (audio.paused) {
-      audio.play().catch(err => console.log("Audio play blocked, wait for user interaction:", err));
-      iconPlay?.classList.add('hidden');
-      iconPause?.classList.remove('hidden');
-      vinylContainer?.classList.add('playing');
-      startWaveform();
-    } else {
-      audio.pause();
-      iconPlay?.classList.remove('hidden');
-      iconPause?.classList.add('hidden');
-      vinylContainer?.classList.remove('playing');
-      stopWaveform();
+
+    const vinyl = document.getElementById('player-vinyl');
+    const vinylArm = document.getElementById('player-arm');
+    const vinylContainer = document.querySelector('.vinyl-container');
+    const btnPlay = document.getElementById('btn-play');
+    const iconPlay = document.querySelector('.icon-play');
+    const iconPause = document.querySelector('.icon-pause');
+    
+    const progressBar = document.getElementById('progress-bar') as HTMLInputElement;
+    const currentTimeLabel = document.getElementById('current-time');
+    const durationTimeLabel = document.getElementById('duration-time');
+    const volumeBar = document.getElementById('volume-bar') as HTMLInputElement;
+    
+    const songTitle = document.getElementById('player-song-title');
+    const songArtist = document.getElementById('player-song-artist');
+    const coverArt = document.getElementById('vinyl-cover-art');
+    const lyricsContent = document.getElementById('lyrics-content');
+    const lyricsScroll = document.getElementById('lyrics-scroll');
+    
+    const playlistItems = document.querySelectorAll('.playlist-item');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const btnBGM = document.getElementById('btn-background');
+
+    let currentBGMId = localStorage.getItem('backgroundSongId') || '1';
+
+    // Sync activeSongId from persistent audio element src
+    let activeSongId = songs[0].id;
+    const currentAudioSrc = audio.getAttribute('src') || '';
+    const matchedSong = songs.find(s => s.url && currentAudioSrc.includes(s.url));
+    if (matchedSong) {
+      activeSongId = matchedSong.id;
     }
-  }
 
-  if (btnPlay) {
-    btnPlay.addEventListener('click', togglePlay);
-  }
+    const currentSong = songs.find(s => s.id === activeSongId) || songs[0];
+    let activeSongLyrics: { time: number; text: string }[] = [];
 
-  // Audio loading logic
-  if (audio) {
+    // Format time (e.g. 125 -> 2:05)
+    function formatTime(secs: number) {
+      if (isNaN(secs)) return '--:--';
+      const minutes = Math.floor(secs / 60);
+      const seconds = Math.floor(secs % 60);
+      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    // Play & Pause controls
+    function togglePlay() {
+      if (audio.paused) {
+        audio.play().then(() => {
+          iconPlay?.classList.add('hidden');
+          iconPause?.classList.remove('hidden');
+          vinylContainer?.classList.add('playing');
+          startWaveform();
+        }).catch(err => console.log("Audio play blocked, wait for user interaction:", err));
+      } else {
+        audio.pause();
+        iconPlay?.classList.remove('hidden');
+        iconPause?.classList.add('hidden');
+        vinylContainer?.classList.remove('playing');
+        stopWaveform();
+      }
+    }
+
+    if (btnPlay) {
+      btnPlay.addEventListener('click', togglePlay);
+    }
+
+    // Audio loading logic
     audio.addEventListener('loadedmetadata', () => {
       if (progressBar) progressBar.max = audio.duration.toString();
       if (durationTimeLabel) durationTimeLabel.innerText = formatTime(audio.duration);
@@ -711,172 +723,162 @@ const originalSongs = songs.filter(s => s.type === 'original');
     audio.addEventListener('ended', () => {
       playNext();
     });
-  }
 
-  // Time slider input change
-  if (progressBar) {
-    progressBar.addEventListener('input', () => {
-      if (audio) audio.currentTime = parseFloat(progressBar.value);
-    });
-  }
-
-  // Volume slider input change
-  if (volumeBar) {
-    volumeBar.addEventListener('input', () => {
-      if (audio) audio.volume = parseFloat(volumeBar.value) / 100;
-    });
-  }
-
-  // Parse LRC format to lyrics array
-  function parseLRC(lrcText: string): { time: number; text: string }[] {
-    const lines = lrcText.split('\n');
-    const result: { time: number; text: string }[] = [];
-    const timeReg = /\[(\d+):(\d+(?:\.\d+)?)\]/g;
-    
-    for (let line of lines) {
-      line = line.trim();
-      if (!line) continue;
-      
-      const matches = [...line.matchAll(timeReg)];
-      if (matches.length === 0) continue;
-      
-      const text = line.replace(timeReg, '').trim();
-      for (const match of matches) {
-        const min = parseInt(match[1], 10);
-        const sec = parseFloat(match[2]);
-        const time = min * 60 + sec;
-        result.push({ time, text });
-      }
-    }
-    
-    result.sort((a, b) => a.time - b.time);
-    return result;
-  }
-
-  // Load lyrics from static URL
-  async function loadLyrics(lyricsUrl: string) {
-    if (!lyricsUrl) {
-      return [{ time: 0, text: "暂无歌词" }];
-    }
-    try {
-      const res = await fetch(lyricsUrl);
-      if (!res.ok) throw new Error("Failed to load lyrics");
-      const text = await res.text();
-      return parseLRC(text);
-    } catch (err) {
-      console.error("Error loading lyrics:", err);
-      return [{ time: 0, text: "歌词加载失败" }];
-    }
-  }
-
-  // Render lyrics elements
-  function renderLyrics(lyrics: { time: number; text: string }[]) {
-    if (lyricsContent) {
-      lyricsContent.innerHTML = lyrics.map((lyric, idx) => `
-        <p class="lyric-line ${idx === 0 ? 'active' : ''}" data-time="${lyric.time}">
-          ${lyric.text}
-        </p>
-      `).join('');
-      lyricsContent.style.transform = 'translateY(40px)';
-    }
-  }
-
-  // Lyrics tracker
-  function updateLyrics(time: number) {
-    if (!lyricsContent || activeSongLyrics.length === 0) return;
-    
-    let activeIndex = -1;
-    for (let i = 0; i < activeSongLyrics.length; i++) {
-      if (time >= activeSongLyrics[i].time) {
-        activeIndex = i;
-      } else {
-        break;
-      }
-    }
-
-    if (activeIndex !== -1) {
-      const lines = lyricsContent.querySelectorAll('.lyric-line');
-      lines.forEach((line, idx) => {
-        if (idx === activeIndex) {
-          line.classList.add('active');
-          const containerHeight = lyricsScroll?.clientHeight || 120;
-          const lineOffset = (line as HTMLElement).offsetTop;
-          const lineHeight = (line as HTMLElement).clientHeight;
-          if (lyricsContent) {
-            lyricsContent.style.transform = `translateY(${containerHeight / 2 - lineOffset - lineHeight / 2}px)`;
-          }
-        } else {
-          line.classList.remove('active');
-        }
+    // Time slider input change
+    if (progressBar) {
+      progressBar.addEventListener('input', () => {
+        audio.currentTime = parseFloat(progressBar.value);
       });
     }
-  }
 
-  // BGM UI Tag synchronizer
-  function updateBGMUI() {
-    // Check tags on list
-    playlistItems.forEach(item => {
-      const songId = item.getAttribute('data-id');
-      const bgmTag = item.querySelector('.bgm-tag');
-      if (bgmTag) {
-        if (songId === currentBGMId) {
-          bgmTag.classList.remove('hidden');
+    // Volume slider input change
+    if (volumeBar) {
+      volumeBar.addEventListener('input', () => {
+        audio.volume = parseFloat(volumeBar.value) / 100;
+      });
+    }
+
+    // Parse LRC format to lyrics array
+    function parseLRC(lrcText: string): { time: number; text: string }[] {
+      const lines = lrcText.split('\n');
+      const result: { time: number; text: string }[] = [];
+      const timeReg = /\[(\d+):(\d+(?:\.\d+)?)\]/g;
+      
+      for (let line of lines) {
+        line = line.trim();
+        if (!line) continue;
+        
+        const matches = [...line.matchAll(timeReg)];
+        if (matches.length === 0) continue;
+        
+        const text = line.replace(timeReg, '').trim();
+        for (const match of matches) {
+          const min = parseInt(match[1], 10);
+          const sec = parseFloat(match[2]);
+          const time = min * 60 + sec;
+          result.push({ time, text });
+        }
+      }
+      
+      result.sort((a, b) => a.time - b.time);
+      return result;
+    }
+
+    // Load lyrics from static URL
+    async function loadLyrics(lyricsUrl: string) {
+      if (!lyricsUrl) {
+        return [{ time: 0, text: "暂无歌词" }];
+      }
+      try {
+        const res = await fetch(lyricsUrl);
+        if (!res.ok) throw new Error("Failed to load lyrics");
+        const text = await res.text();
+        return parseLRC(text);
+      } catch (err) {
+        console.error("Error loading lyrics:", err);
+        return [{ time: 0, text: "歌词加载失败" }];
+      }
+    }
+
+    // Render lyrics elements
+    function renderLyrics(lyrics: { time: number; text: string }[]) {
+      if (lyricsContent) {
+        lyricsContent.innerHTML = lyrics.map((lyric, idx) => `
+          <p class="lyric-line ${idx === 0 ? 'active' : ''}" data-time="${lyric.time}">
+            ${lyric.text}
+          </p>
+        `).join('');
+        lyricsContent.style.transform = 'translateY(40px)';
+      }
+    }
+
+    // Lyrics tracker
+    function updateLyrics(time: number) {
+      if (!lyricsContent || activeSongLyrics.length === 0) return;
+      
+      let activeIndex = -1;
+      for (let i = 0; i < activeSongLyrics.length; i++) {
+        if (time >= activeSongLyrics[i].time) {
+          activeIndex = i;
         } else {
-          bgmTag.classList.add('hidden');
+          break;
         }
       }
-    });
 
-    // Check header button state
-    if (btnBGM) {
-      if (activeSongId === currentBGMId) {
-        btnBGM.classList.add('active');
-      } else {
-        btnBGM.classList.remove('active');
+      if (activeIndex !== -1) {
+        const lines = lyricsContent.querySelectorAll('.lyric-line');
+        lines.forEach((line, idx) => {
+          if (idx === activeIndex) {
+            line.classList.add('active');
+            const containerHeight = lyricsScroll?.clientHeight || 120;
+            const lineOffset = (line as HTMLElement).offsetTop;
+            const lineHeight = (line as HTMLElement).clientHeight;
+            if (lyricsContent) {
+              lyricsContent.style.transform = `translateY(${containerHeight / 2 - lineOffset - lineHeight / 2}px)`;
+            }
+          } else {
+            line.classList.remove('active');
+          }
+        });
       }
     }
-  }
 
-  // Song switching logic by ID
-  async function switchSong(id: string) {
-    const song = songs.find(s => s.id === id);
-    if (!song) return;
-    
-    activeSongId = id;
-
-    // Highlight playing song and prepend to top of its parent list
-    playlistItems.forEach(item => {
-      const itemId = item.getAttribute('data-id');
-      if (itemId === id) {
-        item.classList.add('playing');
-        const parent = item.parentElement;
-        if (parent) {
-          parent.prepend(item);
+    // BGM UI Tag synchronizer
+    function updateBGMUI() {
+      playlistItems.forEach(item => {
+        const songId = item.getAttribute('data-id');
+        const bgmTag = item.querySelector('.bgm-tag');
+        if (bgmTag) {
+          if (songId === currentBGMId) {
+            bgmTag.classList.remove('hidden');
+          } else {
+            bgmTag.classList.add('hidden');
+          }
         }
-      } else {
-        item.classList.remove('playing');
+      });
+
+      if (btnBGM) {
+        if (activeSongId === currentBGMId) {
+          btnBGM.classList.add('active');
+        } else {
+          btnBGM.classList.remove('active');
+        }
       }
-    });
-
-    // Update UI elements
-    if (songTitle) songTitle.innerText = song.title;
-    if (songArtist) songArtist.innerText = song.artist;
-    if (coverArt) coverArt.style.backgroundImage = `url('${song.cover}')`;
-
-    // Show loading state
-    if (lyricsContent) {
-      lyricsContent.innerHTML = '<p class="lyric-line active">正在加载歌词...</p>';
     }
 
-    // Load lyrics from LRC URL
-    activeSongLyrics = await loadLyrics(song.lyricsUrl);
-    renderLyrics(activeSongLyrics);
+    // Song switching logic by ID
+    async function switchSong(id: string) {
+      const song = songs.find(s => s.id === id);
+      if (!song) return;
+      
+      activeSongId = id;
 
-    // Play audio
-    if (audio) {
+      playlistItems.forEach(item => {
+        const itemId = item.getAttribute('data-id');
+        if (itemId === id) {
+          item.classList.add('playing');
+          const parent = item.parentElement;
+          if (parent) {
+            parent.prepend(item);
+          }
+        } else {
+          item.classList.remove('playing');
+        }
+      });
+
+      if (songTitle) songTitle.innerText = song.title;
+      if (songArtist) songArtist.innerText = song.artist;
+      if (coverArt) coverArt.style.backgroundImage = `url('${song.cover}')`;
+
+      if (lyricsContent) {
+        lyricsContent.innerHTML = '<p class="lyric-line active">正在加载歌词...</p>';
+      }
+
+      activeSongLyrics = await loadLyrics(song.lyricsUrl);
+      renderLyrics(activeSongLyrics);
+
       audio.src = song.url;
       audio.load();
-      // Auto play song on switch
       audio.play().then(() => {
         iconPlay?.classList.add('hidden');
         iconPause?.classList.remove('hidden');
@@ -888,148 +890,193 @@ const originalSongs = songs.filter(s => s.type === 'original');
         iconPause?.classList.add('hidden');
         vinylContainer?.classList.remove('playing');
       });
+
+      updateBGMUI();
     }
 
-    // Sync BGM UI states
-    updateBGMUI();
-  }
+    // Play next/prev track
+    function playNext() {
+      const currentIndex = songs.findIndex(s => s.id === activeSongId);
+      let nextIndex = currentIndex + 1;
+      if (nextIndex >= songs.length) nextIndex = 0;
+      switchSong(songs[nextIndex].id);
+    }
 
-  // Play next/prev track in catalog order
-  function playNext() {
-    const currentIndex = songs.findIndex(s => s.id === activeSongId);
-    let nextIndex = currentIndex + 1;
-    if (nextIndex >= songs.length) nextIndex = 0;
-    switchSong(songs[nextIndex].id);
-  }
+    function playPrev() {
+      const currentIndex = songs.findIndex(s => s.id === activeSongId);
+      let prevIndex = currentIndex - 1;
+      if (prevIndex < 0) prevIndex = songs.length - 1;
+      switchSong(songs[prevIndex].id);
+    }
 
-  function playPrev() {
-    const currentIndex = songs.findIndex(s => s.id === activeSongId);
-    let prevIndex = currentIndex - 1;
-    if (prevIndex < 0) prevIndex = songs.length - 1;
-    switchSong(songs[prevIndex].id);
-  }
+    if (btnPrev) btnPrev.addEventListener('click', playPrev);
+    if (btnNext) btnNext.addEventListener('click', playNext);
 
-  if (btnPrev) btnPrev.addEventListener('click', playPrev);
-  if (btnNext) btnNext.addEventListener('click', playNext);
-
-  // Bind click selection on playlist
-  playlistItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const id = item.getAttribute('data-id');
-      if (id) switchSong(id);
+    playlistItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.getAttribute('data-id');
+        if (id) switchSong(id);
+      });
     });
-  });
 
-  // Bind Background button click handler
-  if (btnBGM) {
-    btnBGM.addEventListener('click', () => {
-      currentBGMId = activeSongId;
-      localStorage.setItem('backgroundSongId', currentBGMId);
-      updateBGMUI();
-    });
-  }
-
-  // Bind Expand / Collapse toggles
-  const expandBtns = document.querySelectorAll('.btn-expand');
-  expandBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetId = btn.getAttribute('data-target');
-      if (targetId) {
-        const list = document.getElementById(targetId);
-        if (list) {
-          list.classList.toggle('expanded');
-          const isExpanded = list.classList.contains('expanded');
-          btn.innerHTML = isExpanded ? '收起歌单 📁' : '展开更多 📂';
-        }
-      }
-    });
-  });
-
-  // Initialize page on load
-  if (playlistItems.length > 0) {
-    // Load first song lyrics
-    const defaultUrl = playlistItems[0].getAttribute('data-lyrics-url');
-    if (defaultUrl) {
-      loadLyrics(defaultUrl).then(lyrics => {
-        activeSongLyrics = lyrics;
-        renderLyrics(lyrics);
+    if (btnBGM) {
+      btnBGM.addEventListener('click', () => {
+        currentBGMId = activeSongId;
+        localStorage.setItem('backgroundSongId', currentBGMId);
+        updateBGMUI();
       });
     }
-    // Sync Background BGM state
-    updateBGMUI();
-  }
 
-  // Simulated Glowing Waveform Visualizer
-  const canvas = document.getElementById('waveform-canvas') as HTMLCanvasElement;
-  let ctx: CanvasRenderingContext2D | null = null;
-  let animationId = 0;
-  let isVisualizing = false;
+    const expandBtns = document.querySelectorAll('.btn-expand');
+    expandBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        if (targetId) {
+          const list = document.getElementById(targetId);
+          if (list) {
+            list.classList.toggle('expanded');
+            const isExpanded = list.classList.contains('expanded');
+            btn.innerHTML = isExpanded ? '收起歌单 📁' : '展开更多 📂';
+          }
+        }
+      });
+    });
 
-  if (canvas) {
-    ctx = canvas.getContext('2d');
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    drawWaveformStatic();
-  }
-
-  function resizeCanvas() {
-    if (canvas) {
-      canvas.width = canvas.parentElement?.clientWidth || 320;
-      canvas.height = canvas.parentElement?.clientHeight || 60;
-    }
-  }
-
-  function drawWaveformStatic() {
-    if (!canvas || !ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const barsCount = 40;
-    const barWidth = canvas.width / barsCount - 2;
-    ctx.fillStyle = 'hsla(280, 100%, 60%, 0.2)';
-    for (let i = 0; i < barsCount; i++) {
-      const val = 10 + Math.sin(i * 0.3) * 15;
-      ctx.fillRect(i * (barWidth + 2), canvas.height - val, barWidth, val);
-    }
-  }
-
-  function startWaveform() {
-    if (isVisualizing) return;
-    isVisualizing = true;
-    animateWave();
-  }
-
-  function stopWaveform() {
-    isVisualizing = false;
-    cancelAnimationFrame(animationId);
-    drawWaveformStatic();
-  }
-
-  function animateWave() {
-    if (!isVisualizing || !canvas || !ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Initialize/Sync current UI elements based on song metadata
+    if (songTitle) songTitle.innerText = currentSong.title;
+    if (songArtist) songArtist.innerText = currentSong.artist;
+    if (coverArt) coverArt.style.backgroundImage = `url('${currentSong.cover}')`;
     
-    const barsCount = 35;
-    const barWidth = canvas.width / barsCount - 3;
-    const time = Date.now() * 0.005;
+    if (progressBar) {
+      progressBar.max = isNaN(audio.duration) ? '100' : audio.duration.toString();
+      progressBar.value = audio.currentTime.toString();
+    }
+    if (currentTimeLabel) currentTimeLabel.innerText = formatTime(audio.currentTime);
+    if (durationTimeLabel) durationTimeLabel.innerText = isNaN(audio.duration) ? '--:--' : formatTime(audio.duration);
+    if (volumeBar) volumeBar.value = (audio.volume * 100).toString();
 
-    for (let i = 0; i < barsCount; i++) {
-      let heightVal = 10 + Math.abs(Math.sin(i * 0.4 + time) * 30);
-      heightVal += Math.abs(Math.cos(i * 0.1 - time * 1.5) * 15);
-      
-      if (audio && audio.paused) {
-        heightVal = 5;
+    // Highlight and sort current playing item
+    playlistItems.forEach(item => {
+      const itemId = item.getAttribute('data-id');
+      if (itemId === activeSongId) {
+        item.classList.add('playing');
+        const parent = item.parentElement;
+        if (parent) {
+          parent.prepend(item);
+        }
+      } else {
+        item.classList.remove('playing');
       }
-      
-      const gradient = ctx.createLinearGradient(0, canvas.height - heightVal, 0, canvas.height);
-      gradient.addColorStop(0, 'hsl(185, 100%, 50%)');
-      gradient.addColorStop(1, 'hsl(280, 100%, 60%)');
-      
-      ctx.fillStyle = gradient;
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = 'hsla(185, 100%, 50%, 0.5)';
-      ctx.fillRect(i * (barWidth + 3), canvas.height - heightVal, barWidth, heightVal);
-      ctx.shadowBlur = 0;
+    });
+
+    loadLyrics(currentSong.lyricsUrl).then(lyrics => {
+      activeSongLyrics = lyrics;
+      renderLyrics(lyrics);
+      updateLyrics(audio.currentTime);
+    });
+
+    updateBGMUI();
+
+    // Visualizer Canvas setup
+    const canvas = document.getElementById('waveform-canvas') as HTMLCanvasElement;
+    let ctx: CanvasRenderingContext2D | null = null;
+    let animationId = 0;
+    let isVisualizing = false;
+
+    if (canvas) {
+      ctx = canvas.getContext('2d');
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      drawWaveformStatic();
     }
 
-    animationId = requestAnimationFrame(animateWave);
-  }
+    function resizeCanvas() {
+      if (canvas) {
+        canvas.width = canvas.parentElement?.clientWidth || 320;
+        canvas.height = canvas.parentElement?.clientHeight || 60;
+      }
+    }
+
+    function drawWaveformStatic() {
+      if (!canvas || !ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const barsCount = 40;
+      const barWidth = canvas.width / barsCount - 2;
+      ctx.fillStyle = 'hsla(280, 100%, 60%, 0.2)';
+      for (let i = 0; i < barsCount; i++) {
+        const val = 10 + Math.sin(i * 0.3) * 15;
+        ctx.fillRect(i * (barWidth + 2), canvas.height - val, barWidth, val);
+      }
+    }
+
+    function startWaveform() {
+      if (isVisualizing) return;
+      isVisualizing = true;
+      animateWave();
+    }
+
+    function stopWaveform() {
+      isVisualizing = false;
+      cancelAnimationFrame(animationId);
+      drawWaveformStatic();
+    }
+
+    function animateWave() {
+      if (!isVisualizing || !canvas || !ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      const barsCount = 35;
+      const barWidth = canvas.width / barsCount - 3;
+      const time = Date.now() * 0.005;
+
+      for (let i = 0; i < barsCount; i++) {
+        let heightVal = 10 + Math.abs(Math.sin(i * 0.4 + time) * 30);
+        heightVal += Math.abs(Math.cos(i * 0.1 - time * 1.5) * 15);
+        
+        if (audio && audio.paused) {
+          heightVal = 5;
+        }
+        
+        const gradient = ctx.createLinearGradient(0, canvas.height - heightVal, 0, canvas.height);
+        gradient.addColorStop(0, 'hsl(185, 100%, 50%)');
+        gradient.addColorStop(1, 'hsl(280, 100%, 60%)');
+        
+        ctx.fillStyle = gradient;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = 'hsla(185, 100%, 50%, 0.5)';
+        ctx.fillRect(i * (barWidth + 3), canvas.height - heightVal, barWidth, heightVal);
+        ctx.shadowBlur = 0;
+      }
+
+      animationId = requestAnimationFrame(animateWave);
+    }
+
+    // Sync play state on initialization
+    const isAudioPlaying = !audio.paused && audio.src !== '';
+    if (isAudioPlaying) {
+      iconPlay?.classList.add('hidden');
+      iconPause?.classList.remove('hidden');
+      vinylContainer?.classList.add('playing');
+      startWaveform();
+    } else {
+      iconPlay?.classList.remove('hidden');
+      iconPause?.classList.add('hidden');
+      vinylContainer?.classList.remove('playing');
+      stopWaveform();
+    }
+
+    audio.addEventListener('play', () => {
+      iconPlay?.classList.add('hidden');
+      iconPause?.classList.remove('hidden');
+      vinylContainer?.classList.add('playing');
+      startWaveform();
+    });
+
+    audio.addEventListener('pause', () => {
+      iconPlay?.classList.remove('hidden');
+      iconPause?.classList.add('hidden');
+      vinylContainer?.classList.remove('playing');
+      stopWaveform();
+    });
+  });
 </script>

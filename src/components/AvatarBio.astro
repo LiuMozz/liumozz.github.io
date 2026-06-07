@@ -435,13 +435,15 @@ const {
 </style>
 
 <script>
-  const bio = document.getElementById('bio-container');
-  if (bio) {
-    // Mobile touch toggle
-    bio.addEventListener('click', () => {
-      if (window.innerWidth <= 768) {
-        bio.classList.toggle('touch-active');
-      }
-    });
-  }
+  document.addEventListener('astro:page-load', () => {
+    const bio = document.getElementById('bio-container');
+    if (bio) {
+      // Mobile touch toggle
+      bio.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          bio.classList.toggle('touch-active');
+        }
+      });
+    }
+  });
 </script>

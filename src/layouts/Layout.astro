@@ -1,5 +1,6 @@
 ---
 import '../styles/index.css';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
 	title?: string;
@@ -44,6 +45,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://liumozz.
 		<meta property="twitter:title" content={title} />
 		<meta property="twitter:description" content={description} />
 		<meta property="twitter:image" content={image} />
+
+		<ClientRouter />
 	</head>
 	<body>
 		<!-- Glowing Navigation Header -->
@@ -91,16 +94,18 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://liumozz.
 		</footer>
 
 		<script>
-			// Mobile Navigation Toggle
-			const toggleBtn = document.querySelector('.mobile-nav-toggle');
-			const navLinks = document.querySelector('.nav-links');
+			document.addEventListener('astro:page-load', () => {
+				// Mobile Navigation Toggle
+				const toggleBtn = document.querySelector('.mobile-nav-toggle');
+				const navLinks = document.querySelector('.nav-links');
 
-			if (toggleBtn && navLinks) {
-				toggleBtn.addEventListener('click', () => {
-					toggleBtn.classList.toggle('active');
-					navLinks.classList.toggle('open');
-				});
-			}
+				if (toggleBtn && navLinks) {
+					toggleBtn.addEventListener('click', () => {
+						toggleBtn.classList.toggle('active');
+						navLinks.classList.toggle('open');
+					});
+				}
+			});
 
 			// Glow card mouse tracker
 			document.addEventListener('mousemove', (e) => {

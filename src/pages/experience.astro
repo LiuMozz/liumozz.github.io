@@ -650,23 +650,25 @@ import Layout from '../layouts/Layout.astro';
 </style>
 
 <script>
-  function toggleDetail(id: string) {
-    const detail = document.getElementById(`${id}-detail`);
-    const hint = document.getElementById(`${id}-hint`);
-    if (!detail) return;
-    const isOpen = detail.classList.contains('open');
-    detail.classList.toggle('open', !isOpen);
-    if (hint) {
-      const svg = hint.querySelector('svg');
-      if (svg) {
-        svg.style.transform = isOpen ? '' : 'rotate(180deg)';
-        svg.style.transition = 'transform 0.3s ease';
+  document.addEventListener('astro:page-load', () => {
+    function toggleDetail(id: string) {
+      const detail = document.getElementById(`${id}-detail`);
+      const hint = document.getElementById(`${id}-hint`);
+      if (!detail) return;
+      const isOpen = detail.classList.contains('open');
+      detail.classList.toggle('open', !isOpen);
+      if (hint) {
+        const svg = hint.querySelector('svg');
+        if (svg) {
+          svg.style.transform = isOpen ? '' : 'rotate(180deg)';
+          svg.style.transition = 'transform 0.3s ease';
+        }
+        const span = hint.querySelector('span');
+        if (span) span.textContent = isOpen ? '点击展开详情' : '收起详情';
       }
-      const span = hint.querySelector('span');
-      if (span) span.textContent = isOpen ? '点击展开详情' : '收起详情';
     }
-  }
 
-  // Expose to onclick
-  (window as any).toggleDetail = toggleDetail;
+    // Expose to onclick
+    (window as any).toggleDetail = toggleDetail;
+  });
 </script>

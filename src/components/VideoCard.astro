@@ -203,31 +203,33 @@ const { title, description, videoUrl, thumbnailUrl, tag = '精彩瞬间', accent
 </style>
 
 <script>
-  // Hover preview scripts
-  const videoCards = document.querySelectorAll('.video-card');
-  
-  videoCards.forEach(card => {
-    const video = card.querySelector('.video-preview-tag') as HTMLVideoElement;
+  document.addEventListener('astro:page-load', () => {
+    // Hover preview scripts
+    const videoCards = document.querySelectorAll('.video-card');
     
-    card.addEventListener('mouseenter', () => {
-      card.classList.add('previewing');
-      if (video) {
-        // Preload video if needed and play
-        if (video.readyState === 0) {
-          video.load();
+    videoCards.forEach(card => {
+      const video = card.querySelector('.video-preview-tag') as HTMLVideoElement;
+      
+      card.addEventListener('mouseenter', () => {
+        card.classList.add('previewing');
+        if (video) {
+          // Preload video if needed and play
+          if (video.readyState === 0) {
+            video.load();
+          }
+          video.play().catch(err => {
+            console.log("Silent auto-preview play prevented:", err);
+          });
         }
-        video.play().catch(err => {
-          console.log("Silent auto-preview play prevented:", err);
-        });
-      }
-    });
+      });
 
-    card.addEventListener('mouseleave', () => {
-      card.classList.remove('previewing');
-      if (video) {
-        video.pause();
-        video.currentTime = 0;
-      }
+      card.addEventListener('mouseleave', () => {
+        card.classList.remove('previewing');
+        if (video) {
+          video.pause();
+          video.currentTime = 0;
+        }
+      });
     });
   });
 </script>

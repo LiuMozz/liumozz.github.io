@@ -298,192 +298,195 @@
 </style>
 
 <script>
-  // Bind Video Modal control triggers
-  const modal = document.getElementById('video-modal');
-  const modalVideo = document.getElementById('modal-video-el') as HTMLVideoElement;
-  const modalTitle = document.getElementById('modal-title-el');
-  const modalDesc = document.getElementById('modal-desc-el');
-  const modalClose = document.getElementById('modal-close');
-  
-  const videoPlayBtn = document.getElementById('video-play-btn');
-  const playIcon = videoPlayBtn?.querySelector('.play-icon');
-  const pauseIcon = videoPlayBtn?.querySelector('.pause-icon');
-  
-  const bigPlayBtn = document.getElementById('video-big-play');
-  const timeline = document.getElementById('video-timeline') as HTMLInputElement;
-  const timeLabel = document.getElementById('video-time-txt');
-  
-  const muteBtn = document.getElementById('video-mute-btn');
-  const volOnIcon = muteBtn?.querySelector('.vol-on');
-  const volOffIcon = muteBtn?.querySelector('.vol-off');
-  const volumeSlider = document.getElementById('video-volume') as HTMLInputElement;
-  const fullscreenBtn = document.getElementById('video-fullscreen-btn');
-  const playerContainer = document.getElementById('video-player-container');
+  document.addEventListener('astro:page-load', () => {
+    // Bind Video Modal control triggers
+    const modal = document.getElementById('video-modal');
+    const modalVideo = document.getElementById('modal-video-el') as HTMLVideoElement;
+    const modalTitle = document.getElementById('modal-title-el');
+    const modalDesc = document.getElementById('modal-desc-el');
+    const modalClose = document.getElementById('modal-close');
+    
+    const videoPlayBtn = document.getElementById('video-play-btn');
+    const playIcon = videoPlayBtn?.querySelector('.play-icon');
+    const pauseIcon = videoPlayBtn?.querySelector('.pause-icon');
+    
+    const bigPlayBtn = document.getElementById('video-big-play');
+    const timeline = document.getElementById('video-timeline') as HTMLInputElement;
+    const timeLabel = document.getElementById('video-time-txt');
+    
+    const muteBtn = document.getElementById('video-mute-btn');
+    const volOnIcon = muteBtn?.querySelector('.vol-on');
+    const volOffIcon = muteBtn?.querySelector('.vol-off');
+    const volumeSlider = document.getElementById('video-volume') as HTMLInputElement;
+    const fullscreenBtn = document.getElementById('video-fullscreen-btn');
+    const playerContainer = document.getElementById('video-player-container');
 
-  // Trigger modal open from Video Cards
-  const cards = document.querySelectorAll('[data-video-url]');
-  cards.forEach(card => {
-    card.addEventListener('click', () => {
-      const videoUrl = card.getAttribute('data-video-url') || '';
-      const title = card.getAttribute('data-video-title') || '';
-      const desc = card.getAttribute('data-video-desc') || '';
+    // Trigger modal open from Video Cards
+    const cards = document.querySelectorAll('[data-video-url]');
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const videoUrl = card.getAttribute('data-video-url') || '';
+        const title = card.getAttribute('data-video-title') || '';
+        const desc = card.getAttribute('data-video-desc') || '';
 
-      if (modal && modalVideo) {
-        modalVideo.src = videoUrl;
-        if (modalTitle) modalTitle.innerText = title;
-        if (modalDesc) modalDesc.innerText = desc;
-        
-        modal.classList.add('open');
-        
-        // Auto play inside modal
-        setTimeout(() => {
-          modalVideo.play().then(() => {
-            playIcon?.classList.add('hidden');
-            pauseIcon?.classList.remove('hidden');
-            bigPlayBtn?.classList.add('hidden');
-          }).catch(err => {
-            console.log("Autoplay on modal blocked, show big button:", err);
-            bigPlayBtn?.classList.remove('hidden');
-          });
-        }, 100);
-      }
+        if (modal && modalVideo) {
+          modalVideo.src = videoUrl;
+          if (modalTitle) modalTitle.innerText = title;
+          if (modalDesc) modalDesc.innerText = desc;
+          
+          modal.classList.add('open');
+          
+          // Auto play inside modal
+          setTimeout(() => {
+            modalVideo.play().then(() => {
+              playIcon?.classList.add('hidden');
+              pauseIcon?.classList.remove('hidden');
+              bigPlayBtn?.classList.add('hidden');
+            }).catch(err => {
+              console.log("Autoplay on modal blocked, show big button:", err);
+              bigPlayBtn?.classList.remove('hidden');
+            });
+          }, 100);
+        }
+      });
     });
-  });
 
-  // Close modal logic
-  function closeModal() {
-    if (modal) {
-      modal.classList.remove('open');
-      if (modalVideo) {
-        modalVideo.pause();
-        modalVideo.src = ''; // Clear source to stop buffering
+    // Close modal logic
+    function closeModal() {
+      if (modal) {
+        modal.classList.remove('open');
+        if (modalVideo) {
+          modalVideo.pause();
+          modalVideo.src = ''; // Clear source to stop buffering
+        }
       }
     }
-  }
 
-  if (modalClose) modalClose.addEventListener('click', closeModal);
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      // Close only if clicked directly on overlay backdrop
-      if (e.target === modal) {
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        // Close only if clicked directly on overlay backdrop
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+    }
+
+    // Handle escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal?.classList.contains('open')) {
         closeModal();
       }
     });
-  }
 
-  // Handle escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal?.classList.contains('open')) {
-      closeModal();
+    // Video Controls functions
+    function toggleVideo() {
+      if (!modalVideo) return;
+      if (modalVideo.paused) {
+        modalVideo.play();
+        playIcon?.classList.add('hidden');
+        pauseIcon?.classList.remove('hidden');
+        bigPlayBtn?.classList.add('hidden');
+      } else {
+        modalVideo.pause();
+        playIcon?.classList.remove('hidden');
+        playIcon?.classList.remove('hidden');
+        pauseIcon?.classList.add('hidden');
+        bigPlayBtn?.classList.remove('hidden');
+      }
+    }
+
+    if (videoPlayBtn) videoPlayBtn.addEventListener('click', toggleVideo);
+    if (bigPlayBtn) bigPlayBtn.addEventListener('click', toggleVideo);
+    if (modalVideo) {
+      modalVideo.addEventListener('click', toggleVideo);
+      
+      // Updates
+      modalVideo.addEventListener('timeupdate', () => {
+        if (timeline) {
+          timeline.value = ((modalVideo.currentTime / modalVideo.duration) * 100).toString();
+        }
+        updateTimeLabel();
+      });
+
+      modalVideo.addEventListener('loadedmetadata', () => {
+        if (timeline) timeline.value = '0';
+        updateTimeLabel();
+      });
+    }
+
+    function formatDuration(secs: number) {
+      if (isNaN(secs)) return '0:00';
+      const minutes = Math.floor(secs / 60);
+      const seconds = Math.floor(secs % 60);
+      return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    function updateTimeLabel() {
+      if (modalVideo && timeLabel) {
+        const current = formatDuration(modalVideo.currentTime);
+        const total = formatDuration(modalVideo.duration);
+        timeLabel.innerText = `${current} / ${total}`;
+      }
+    }
+
+    // Timeline slider change
+    if (timeline) {
+      timeline.addEventListener('input', () => {
+        if (modalVideo) {
+          const time = (parseFloat(timeline.value) / 100) * modalVideo.duration;
+          modalVideo.currentTime = time;
+        }
+      });
+    }
+
+    // Volume control
+    if (volumeSlider) {
+      volumeSlider.addEventListener('input', () => {
+        if (modalVideo) {
+          const val = parseFloat(volumeSlider.value) / 100;
+          modalVideo.volume = val;
+          modalVideo.muted = val === 0;
+          
+          if (val === 0) {
+            volOnIcon?.classList.add('hidden');
+            volOffIcon?.classList.remove('hidden');
+          } else {
+            volOnIcon?.classList.remove('hidden');
+            volOffIcon?.classList.add('hidden');
+          }
+        }
+      });
+    }
+
+    if (muteBtn) {
+      muteBtn.addEventListener('click', () => {
+        if (modalVideo) {
+          modalVideo.muted = !modalVideo.muted;
+          if (modalVideo.muted) {
+            volOnIcon?.classList.add('hidden');
+            volOffIcon?.classList.remove('hidden');
+            if (volumeSlider) volumeSlider.value = '0';
+          } else {
+            volOnIcon?.classList.remove('hidden');
+            volOffIcon?.classList.add('hidden');
+            if (volumeSlider) volumeSlider.value = (modalVideo.volume * 100).toString();
+          }
+        }
+      });
+    }
+
+    // Fullscreen
+    if (fullscreenBtn && playerContainer) {
+      fullscreenBtn.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          playerContainer.requestFullscreen().catch(err => {
+            console.log("Error launching fullscreen:", err);
+          });
+        } else {
+          document.exitFullscreen();
+        }
+      });
     }
   });
-
-  // Video Controls functions
-  function toggleVideo() {
-    if (!modalVideo) return;
-    if (modalVideo.paused) {
-      modalVideo.play();
-      playIcon?.classList.add('hidden');
-      pauseIcon?.classList.remove('hidden');
-      bigPlayBtn?.classList.add('hidden');
-    } else {
-      modalVideo.pause();
-      playIcon?.classList.remove('hidden');
-      pauseIcon?.classList.add('hidden');
-      bigPlayBtn?.classList.remove('hidden');
-    }
-  }
-
-  if (videoPlayBtn) videoPlayBtn.addEventListener('click', toggleVideo);
-  if (bigPlayBtn) bigPlayBtn.addEventListener('click', toggleVideo);
-  if (modalVideo) {
-    modalVideo.addEventListener('click', toggleVideo);
-    
-    // Updates
-    modalVideo.addEventListener('timeupdate', () => {
-      if (timeline) {
-        timeline.value = ((modalVideo.currentTime / modalVideo.duration) * 100).toString();
-      }
-      updateTimeLabel();
-    });
-
-    modalVideo.addEventListener('loadedmetadata', () => {
-      if (timeline) timeline.value = '0';
-      updateTimeLabel();
-    });
-  }
-
-  function formatDuration(secs: number) {
-    if (isNaN(secs)) return '0:00';
-    const minutes = Math.floor(secs / 60);
-    const seconds = Math.floor(secs % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  }
-
-  function updateTimeLabel() {
-    if (modalVideo && timeLabel) {
-      const current = formatDuration(modalVideo.currentTime);
-      const total = formatDuration(modalVideo.duration);
-      timeLabel.innerText = `${current} / ${total}`;
-    }
-  }
-
-  // Timeline slider change
-  if (timeline) {
-    timeline.addEventListener('input', () => {
-      if (modalVideo) {
-        const time = (parseFloat(timeline.value) / 100) * modalVideo.duration;
-        modalVideo.currentTime = time;
-      }
-    });
-  }
-
-  // Volume control
-  if (volumeSlider) {
-    volumeSlider.addEventListener('input', () => {
-      if (modalVideo) {
-        const val = parseFloat(volumeSlider.value) / 100;
-        modalVideo.volume = val;
-        modalVideo.muted = val === 0;
-        
-        if (val === 0) {
-          volOnIcon?.classList.add('hidden');
-          volOffIcon?.classList.remove('hidden');
-        } else {
-          volOnIcon?.classList.remove('hidden');
-          volOffIcon?.classList.add('hidden');
-        }
-      }
-    });
-  }
-
-  if (muteBtn) {
-    muteBtn.addEventListener('click', () => {
-      if (modalVideo) {
-        modalVideo.muted = !modalVideo.muted;
-        if (modalVideo.muted) {
-          volOnIcon?.classList.add('hidden');
-          volOffIcon?.classList.remove('hidden');
-          if (volumeSlider) volumeSlider.value = '0';
-        } else {
-          volOnIcon?.classList.remove('hidden');
-          volOffIcon?.classList.add('hidden');
-          if (volumeSlider) volumeSlider.value = (modalVideo.volume * 100).toString();
-        }
-      }
-    });
-  }
-
-  // Fullscreen
-  if (fullscreenBtn && playerContainer) {
-    fullscreenBtn.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        playerContainer.requestFullscreen().catch(err => {
-          console.log("Error launching fullscreen:", err);
-        });
-      } else {
-        document.exitFullscreen();
-      }
-    });
-  }
 </script>

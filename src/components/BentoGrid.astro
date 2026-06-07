@@ -56,7 +56,7 @@ import BentoCard from './BentoCard.astro';
       <svg class="icon-pause hidden" viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
     </button>
     <!-- Hidden Audio BGM Player -->
-    <audio id="home-bgm-audio"></audio>
+    <audio id="home-bgm-audio" transition:persist></audio>
   </div>
 
   <!-- Gaming Center Card -->
@@ -424,74 +424,85 @@ import BentoCard from './BentoCard.astro';
 <script>
   import { songs } from '../data/songs';
 
-  const audio = document.getElementById('home-bgm-audio') as HTMLAudioElement;
-  const playBtn = document.getElementById('home-bgm-play-btn');
-  const vinyl = document.getElementById('home-vinyl-record');
-  const vinylArm = document.getElementById('home-vinyl-arm');
-  const musicWave = document.getElementById('home-music-wave');
+  document.addEventListener('astro:page-load', () => {
+    const audio = document.getElementById('home-bgm-audio') as HTMLAudioElement;
+    const playBtn = document.getElementById('home-bgm-play-btn');
+    const vinyl = document.getElementById('home-vinyl-record');
+    const vinylArm = document.getElementById('home-vinyl-arm');
+    const musicWave = document.getElementById('home-music-wave');
 
-  const iconPlay = playBtn?.querySelector('.icon-play');
-  const iconPause = playBtn?.querySelector('.icon-pause');
+    if (!audio || !playBtn) return;
 
-  let isPlaying = false;
+    const iconPlay = playBtn.querySelector('.icon-play');
+    const iconPause = playBtn.querySelector('.icon-pause');
 
-  function toggleBGM() {
-    if (!audio) return;
-    
-    if (audio.paused) {
-      // Get the backgroundSongId from localStorage
-      const bgmId = localStorage.getItem('backgroundSongId') || '1';
-      const song = songs.find(s => s.id === bgmId) || songs[0];
-      
-      // If audio source is empty or changed, load it
-      const currentSrc = audio.getAttribute('src');
-      if (!currentSrc || !currentSrc.includes(song.url)) {
-        audio.src = song.url;
-        audio.load();
-      }
-      
-      audio.play().then(() => {
-        isPlaying = true;
+    // Sync state with actual audio playing state
+    let isPlaying = !audio.paused && audio.src !== '';
+
+    function toggleBGM() {
+      if (audio.paused) {
+        // Get the backgroundSongId from localStorage
+        const bgmId = localStorage.getItem('backgroundSongId') || '1';
+        const song = songs.find(s => s.id === bgmId) || songs[0];
+        
+        // If audio source is empty or changed, load it
+        const currentSrc = audio.getAttribute('src');
+        if (!currentSrc || !currentSrc.includes(song.url)) {
+          audio.src = song.url;
+          audio.load();
+        }
+        
+        audio.play().then(() => {
+          isPlaying = true;
+          updateUI();
+        }).catch(err => {
+          console.log("Audio play blocked:", err);
+        });
+      } else {
+        audio.pause();
+        isPlaying = false;
         updateUI();
-      }).catch(err => {
-        console.log("Audio play blocked:", err);
-      });
-    } else {
-      audio.pause();
-      isPlaying = false;
-      updateUI();
+      }
     }
-  }
 
-  function updateUI() {
-    if (isPlaying) {
-      iconPlay?.classList.add('hidden');
-      iconPause?.classList.remove('hidden');
-      vinyl?.classList.add('playing');
-      vinylArm?.classList.add('playing');
-      musicWave?.classList.add('playing');
-    } else {
-      iconPlay?.classList.remove('hidden');
-      iconPause?.classList.add('hidden');
-      vinyl?.classList.remove('playing');
-      vinylArm?.classList.remove('playing');
-      musicWave?.classList.remove('playing');
+    function updateUI() {
+      if (isPlaying) {
+        iconPlay?.classList.add('hidden');
+        iconPause?.classList.remove('hidden');
+        vinyl?.classList.add('playing');
+        vinylArm?.classList.add('playing');
+        musicWave?.classList.add('playing');
+      } else {
+        iconPlay?.classList.remove('hidden');
+        iconPause?.classList.add('hidden');
+        vinyl?.classList.remove('playing');
+        vinylArm?.classList.remove('playing');
+        musicWave?.classList.remove('playing');
+      }
     }
-  }
 
-  if (playBtn) {
+    // Run initial sync
+    updateUI();
+
     playBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation(); // Prevents navigating to /music
       toggleBGM();
     });
-  }
 
-  // Audio ended handler to reset UI
-  if (audio) {
     audio.addEventListener('ended', () => {
       isPlaying = false;
       updateUI();
     });
-  }
+
+    audio.addEventListener('play', () => {
+      isPlaying = true;
+      updateUI();
+    });
+
+    audio.addEventListener('pause', () => {
+      isPlaying = false;
+      updateUI();
+    });
+  });
 </script>
