@@ -1,0 +1,267 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  return [
+    { params: { category: 'tech' }, props: { name: '技术', accent: 'cyan', icon: '💻', description: '核心开发日常、踩坑记录及系统架构设计思考' } },
+    { params: { category: 'thoughts' }, props: { name: '思考', accent: 'purple', icon: '🧠', description: '成长心智模型、技术方法论与生活态度反思' } },
+    { params: { category: 'ramblings' }, props: { name: '碎碎念', accent: 'emerald', icon: '💬', description: '琐碎生活微光、随笔随感与日常记录' } }
+  ];
+}
+
+const { category } = Astro.params;
+const { name, accent, icon, description } = Astro.props;
+
+// Fetch and filter posts for this category
+const posts = (await getCollection('posts'))
+  .filter(post => !post.data.draft && post.data.categories.includes(name))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<Layout 
+  title={`${icon} 分类：${name} | 猛男妙妙屋`} 
+  description={description}
+>
+  <div class="category-posts-page">
+    <!-- Breadcrumbs & Header -->
+    <nav class="breadcrumb-nav">
+      <a href="/posts" class="breadcrumb-link">Blog</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">分类：{name}</span>
+    </nav>
+
+    <header class="category-header">
+      <h1 class={`page-title text-gradient-${accent}`}>{icon} {name}</h1>
+      <p class="page-subtitle">{description}</p>
+    </header>
+
+    <div class="posts-container">
+      {posts.length > 0 ? (
+        <div class="posts-list">
+          {posts.map(post => (
+            <article class={`post-card glass glow-card accent-${accent}`}>
+              <div class="post-card-content">
+                <header class="post-card-header">
+                  <span class="post-card-date">
+                    📅 {post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                  </span>
+                  <a href={`/posts/${post.id}`} class="post-card-title-link">
+                    <h2 class="post-card-title">{post.data.title}</h2>
+                  </a>
+                </header>
+                
+                <p class="post-card-desc">{post.data.description || "暂无描述..."}</p>
+                
+                <footer class="post-card-footer">
+                  {post.data.tags.length > 0 && (
+                    <div class="post-card-tags">
+                      {post.data.tags.map(tag => (
+                        <a href={`/tags/${tag}`} class="tag-badge">#{tag}</a>
+                      ))}
+                    </div>
+                  )}
+                  <a href={`/posts/${post.id}`} class={`btn-read-more text-color-${accent}`}>阅读全文 →</a>
+                </footer>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div class="no-posts glass">
+          <p>📭 该分类下暂无文章，敬请期待！</p>
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .category-posts-page {
+    padding: 2rem 0;
+  }
+
+  /* Breadcrumbs */
+  .breadcrumb-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: hsl(var(--text-muted));
+    margin-bottom: 2rem;
+  }
+
+  .breadcrumb-link {
+    color: hsl(var(--text-secondary));
+    text-decoration: none;
+    transition: var(--transition-smooth);
+  }
+
+  .breadcrumb-link:hover {
+    color: hsl(var(--neon-cyan));
+    text-shadow: 0 0 5px hsla(var(--neon-cyan), 0.3);
+  }
+
+  .breadcrumb-separator {
+    color: hsla(var(--border-glass));
+  }
+
+  .breadcrumb-current {
+    color: hsl(var(--text-muted));
+  }
+
+  /* Header */
+  .category-header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+  }
+
+  .page-title {
+    font-size: 2.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .page-subtitle {
+    color: hsl(var(--text-secondary));
+    font-size: 1.05rem;
+  }
+
+  /* Posts list container */
+  .posts-container {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .post-card {
+    padding: 2rem;
+    border-color: hsla(var(--border-glass));
+    transition: var(--transition-smooth);
+    position: relative;
+    border-radius: var(--radius-md);
+  }
+
+  /* Glow Card boundaries and colors on hover */
+  .accent-cyan:hover {
+    border-color: hsla(var(--neon-cyan), 0.4);
+    box-shadow: 0 10px 25px -5px hsla(var(--neon-cyan), 0.2);
+  }
+  .accent-purple:hover {
+    border-color: hsla(var(--neon-purple), 0.4);
+    box-shadow: 0 10px 25px -5px hsla(var(--neon-purple), 0.2);
+  }
+  .accent-emerald:hover {
+    border-color: hsla(var(--neon-emerald), 0.4);
+    box-shadow: 0 10px 25px -5px hsla(var(--neon-emerald), 0.2);
+  }
+
+  .post-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .post-card-date {
+    font-size: 0.85rem;
+    color: hsl(var(--text-muted));
+    font-family: monospace;
+  }
+
+  .post-card-title-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .post-card-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    transition: var(--transition-smooth);
+  }
+
+  .accent-cyan:hover .post-card-title { color: hsl(var(--neon-cyan)); }
+  .accent-purple:hover .post-card-title { color: hsl(var(--neon-purple)); }
+  .accent-emerald:hover .post-card-title { color: hsl(var(--neon-emerald)); }
+
+  .post-card-desc {
+    color: hsl(var(--text-secondary));
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .post-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-top: 1px solid hsla(var(--border-glass));
+    padding-top: 1rem;
+  }
+
+  .post-card-tags {
+    display: flex;
+    gap: 0.6rem;
+  }
+
+  .tag-badge {
+    font-size: 0.78rem;
+    color: hsl(var(--text-secondary));
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid hsla(var(--border-glass));
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+  }
+
+  .accent-cyan .tag-badge:hover {
+    color: hsl(var(--neon-cyan));
+    border-color: hsl(var(--neon-cyan));
+    background: hsla(var(--neon-cyan), 0.05);
+  }
+  .accent-purple .tag-badge:hover {
+    color: hsl(var(--neon-purple));
+    border-color: hsl(var(--neon-purple));
+    background: hsla(var(--neon-purple), 0.05);
+  }
+  .accent-emerald .tag-badge:hover {
+    color: hsl(var(--neon-emerald));
+    border-color: hsl(var(--neon-emerald));
+    background: hsla(var(--neon-emerald), 0.05);
+  }
+
+  .btn-read-more {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+  }
+
+  .text-color-cyan { color: hsl(var(--neon-cyan)); }
+  .text-color-purple { color: hsl(var(--neon-purple)); }
+  .text-color-emerald { color: hsl(var(--neon-emerald)); }
+
+  .btn-read-more:hover {
+    transform: translateX(3px);
+  }
+  
+  .text-color-cyan:hover { text-shadow: 0 0 5px hsla(var(--neon-cyan), 0.5); }
+  .text-color-purple:hover { text-shadow: 0 0 5px hsla(var(--neon-purple), 0.5); }
+  .text-color-emerald:hover { text-shadow: 0 0 5px hsla(var(--neon-emerald), 0.5); }
+
+  .no-posts {
+    padding: 3rem;
+    text-align: center;
+    color: hsl(var(--text-secondary));
+    border-radius: var(--radius-md);
+    border-color: hsla(var(--border-glass));
+  }
+</style>

@@ -3,7 +3,7 @@ title: "Java刷题总结"
 date: 2026-06-07T12:24:00+08:00
 author: "LiuWhite"
 tags: ["Java", "算法", "LeetCode", "刷题", "数据结构"]
-categories: ["学习笔记"]
+categories: ["技术"]
 description: "整理自 LiuWhite 的算法与数据结构刷题总结，包含经典排序算法、双指针、滑动窗口、KMP、链表与二叉树等常考面试题解。"
 draft: false
 weight: 2

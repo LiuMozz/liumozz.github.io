@@ -2,57 +2,102 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 
-const posts = (await getCollection('posts'))
+// Fetch and filter posts, sorted by newest first
+const allPosts = (await getCollection('posts'))
   .filter(post => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Categorize posts
+const techPosts = allPosts.filter(post => post.data.categories.includes('技术'));
+const thoughtsPosts = allPosts.filter(post => post.data.categories.includes('思考'));
+const ramblingsPosts = allPosts.filter(post => post.data.categories.includes('碎碎念'));
+
+const categories = [
+  {
+    key: 'tech',
+    name: '技术',
+    englishName: 'Technology',
+    subtitle: '核心开发日常、踩坑记录及系统架构设计思考',
+    posts: techPosts,
+    accent: 'cyan',
+    icon: '💻',
+    glowColor: 'hsla(var(--neon-cyan), 0.3)'
+  },
+  {
+    key: 'thoughts',
+    name: '思考',
+    englishName: 'Thoughts',
+    subtitle: '成长心智模型、技术方法论与生活态度反思',
+    posts: thoughtsPosts,
+    accent: 'purple',
+    icon: '🧠',
+    glowColor: 'hsla(var(--neon-purple), 0.3)'
+  },
+  {
+    key: 'ramblings',
+    name: '碎碎念',
+    englishName: 'Ramblings',
+    subtitle: '琐碎生活微光、随笔碎碎念与日常碎影记录',
+    posts: ramblingsPosts,
+    accent: 'emerald',
+    icon: '💬',
+    glowColor: 'hsla(var(--neon-emerald), 0.3)'
+  }
+];
 ---
 
 <Layout 
-  title="💻 技术博客 | 猛男妙妙屋" 
-  description="进入猛男妙妙屋的技术博客，记录开发日常、系统架构思考和踩坑记录。"
+  title="💻 Blog | 猛男妙妙屋" 
+  description="进入猛男妙妙屋的博客空间，记录开发日常、系统架构思考和踩坑记录。"
 >
   <div class="blog-catalog-page">
     <header class="catalog-header">
-      <h1 class="page-title text-gradient-cyan">💻 技术博客</h1>
-      <p class="page-subtitle">学而不思则罔，思而不学则殆。这里记录我探索数字世界的点点滴滴。</p>
+      <h1 class="page-title text-gradient-cyan">💻 Blog</h1>
+      <p class="page-subtitle">学而不思则罔，思而不学则殆。这里记录我探索数字世界与生活的点点滴滴。</p>
     </header>
 
-    <div class="catalog-container">
-      {posts.length > 0 ? (
-        <div class="posts-list">
-          {posts.map(post => (
-            <article class="post-card glass glow-card accent-cyan">
-              <div class="post-card-content">
-                <header class="post-card-header">
-                  <span class="post-card-date">
-                    📅 {post.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })}
-                  </span>
-                  <a href={`/posts/${post.id}`} class="post-card-title-link">
-                    <h2 class="post-card-title">{post.data.title}</h2>
-                  </a>
-                </header>
-                
-                <p class="post-card-desc">{post.data.description || "暂无描述..."}</p>
-                
-                <footer class="post-card-footer">
-                  {post.data.tags.length > 0 && (
-                    <div class="post-card-tags">
-                      {post.data.tags.map(tag => (
-                        <a href={`/tags/${tag}`} class="tag-badge">#{tag}</a>
-                      ))}
-                    </div>
-                  )}
-                  <a href={`/posts/${post.id}`} class="btn-read-more">阅读全文 →</a>
-                </footer>
+    <div class="catalog-grid">
+      {categories.map(category => (
+        <div class="category-column">
+          <!-- Category 3D Tilt Card -->
+          <a href={`/posts/category/${category.key}`} class={`category-card glass glow-card accent-${category.accent}`} data-tilt>
+            <div class="card-glow" style={`--accent-color: ${category.glowColor}`}></div>
+            <div class="card-content">
+              <div class="card-header">
+                <span class={`card-title text-gradient-${category.accent}`}>{category.icon} {category.name}</span>
+                <span class="card-arrow">→</span>
               </div>
-            </article>
-          ))}
+              <p class="card-subtitle">{category.subtitle}</p>
+              <div class="category-meta-info">
+                <span>共 {category.posts.length} 篇文章</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Preview List (Latest 3) -->
+          <div class="preview-list-container">
+            <h3 class="preview-section-title">✨ 最新预览</h3>
+            {category.posts.length > 0 ? (
+              <ul class="preview-list">
+                {category.posts.slice(0, 3).map(post => (
+                  <li class="preview-item">
+                    <a href={`/posts/${post.id}`} class="preview-link">
+                      <span class="preview-date">
+                        {post.data.date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })}
+                      </span>
+                      <span class="preview-title" title={post.data.title}>{post.data.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div class="empty-preview glass">
+                <p>📭 暂无文章，敬请期待！</p>
+              </div>
+            )}
+          </div>
         </div>
-      ) : (
-        <div class="no-posts glass">
-          <p>📭 暂无文章，敬请期待！</p>
-        </div>
-      )}
+      ))}
     </div>
   </div>
 </Layout>
@@ -77,112 +122,234 @@ const posts = (await getCollection('posts'))
     font-size: 1.05rem;
   }
 
-  .catalog-container {
-    max-width: 800px;
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  .posts-list {
-    display: flex;
-    flex-direction: column;
+  .catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
+    max-width: 1100px;
+    width: 100%;
+    margin: 2rem auto;
+    align-items: flex-start;
   }
 
-  .post-card {
-    padding: 2rem;
-    border-color: hsla(var(--border-glass));
-    transition: var(--transition-smooth);
-  }
-
-  .post-card:hover {
-    border-color: hsla(var(--neon-cyan), 0.4);
-    box-shadow: 0 10px 25px -5px hsla(var(--neon-cyan), 0.2);
-  }
-
-  .post-card-header {
+  .category-column {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 1.5rem;
+    min-width: 0;
   }
 
-  .post-card-date {
-    font-size: 0.85rem;
-    color: hsl(var(--text-muted));
-    font-family: monospace;
-  }
-
-  .post-card-title-link {
+  /* 3D Tilt Card design matching homepage bento cards */
+  .category-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 1.8rem;
     text-decoration: none;
-    color: inherit;
+    overflow: hidden;
+    min-height: 180px;
+    border-color: hsla(var(--border-glass));
+    transition: var(--transition-smooth), transform 0.1s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    border-radius: var(--radius-md);
   }
 
-  .post-card-title {
-    font-size: 1.6rem;
-    font-weight: 700;
-    transition: var(--transition-smooth);
+  .card-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--accent-color) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    z-index: 1;
   }
 
-  .post-card:hover .post-card-title {
-    color: hsl(var(--neon-cyan));
+  .category-card:hover {
+    border-color: var(--accent-border);
+    box-shadow: 0 10px 30px -10px var(--accent-shadow);
   }
 
-  .post-card-desc {
-    color: hsl(var(--text-secondary));
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
+  .category-card:hover .card-glow {
+    opacity: 1;
   }
 
-  .post-card-footer {
+  .accent-cyan {
+    --accent-border: hsla(var(--neon-cyan), 0.4);
+    --accent-shadow: hsla(var(--neon-cyan), 0.25);
+  }
+  .accent-purple {
+    --accent-border: hsla(var(--neon-purple), 0.4);
+    --accent-shadow: hsla(var(--neon-purple), 0.25);
+  }
+  .accent-emerald {
+    --accent-border: hsla(var(--neon-emerald), 0.4);
+    --accent-shadow: hsla(var(--neon-emerald), 0.25);
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    z-index: 2;
+    transform: translateZ(20px);
+  }
+
+  .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    border-top: 1px solid hsla(var(--border-glass));
-    padding-top: 1rem;
+    margin-bottom: 0.8rem;
   }
 
-  .post-card-tags {
+  .card-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+  }
+
+  .card-arrow {
+    font-size: 1.1rem;
+    color: hsl(var(--text-muted));
+    transition: var(--transition-bounce);
+  }
+
+  .category-card:hover .card-arrow {
+    transform: translateX(5px) scale(1.2);
+    color: #ffffff;
+  }
+
+  .card-subtitle {
+    font-size: 0.85rem;
+    color: hsl(var(--text-secondary));
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    flex: 1;
+  }
+
+  .category-meta-info {
+    font-size: 0.8rem;
+    color: hsl(var(--text-muted));
+    font-weight: 500;
+  }
+
+  /* Preview lists styling */
+  .preview-list-container {
     display: flex;
-    gap: 0.6rem;
+    flex-direction: column;
+    gap: 0.8rem;
   }
 
-  .tag-badge {
-    font-size: 0.78rem;
-    color: hsl(var(--text-secondary));
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid hsla(var(--border-glass));
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    text-decoration: none;
-    transition: var(--transition-smooth);
-  }
-
-  .tag-badge:hover {
-    color: hsl(var(--neon-cyan));
-    border-color: hsl(var(--neon-cyan));
-    background: hsla(var(--neon-cyan), 0.05);
-  }
-
-  .btn-read-more {
-    font-size: 0.9rem;
+  .preview-section-title {
+    font-size: 0.95rem;
+    color: hsl(var(--text-muted));
     font-weight: 600;
-    color: hsl(var(--neon-cyan));
+    padding-left: 0.2rem;
+    letter-spacing: 0.05em;
+  }
+
+  .preview-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .preview-item {
+    width: 100%;
+  }
+
+  .preview-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.2rem;
+    border-radius: var(--radius-sm);
+    background: hsla(var(--card-bg-glass));
+    border: 1px solid hsla(var(--border-glass));
     text-decoration: none;
     transition: var(--transition-smooth);
   }
 
-  .btn-read-more:hover {
-    text-shadow: 0 0 5px hsla(var(--neon-cyan), 0.5);
-    transform: translateX(3px);
+  .preview-link:hover {
+    background: hsla(var(--card-bg-glass), 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
 
-  .no-posts {
-    padding: 3rem;
-    text-align: center;
+  .category-column:nth-child(1) .preview-link:hover { border-color: hsla(var(--neon-cyan), 0.35); }
+  .category-column:nth-child(2) .preview-link:hover { border-color: hsla(var(--neon-purple), 0.35); }
+  .category-column:nth-child(3) .preview-link:hover { border-color: hsla(var(--neon-emerald), 0.35); }
+
+  .preview-date {
+    font-size: 0.8rem;
+    color: hsl(var(--text-muted));
+    font-family: monospace;
+    flex-shrink: 0;
+  }
+
+  .preview-title {
+    font-size: 0.92rem;
     color: hsl(var(--text-secondary));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: var(--transition-smooth);
+  }
+
+  .preview-link:hover .preview-title {
+    color: #ffffff;
+  }
+
+  .empty-preview {
+    padding: 1.5rem;
+    text-align: center;
+    color: hsl(var(--text-muted));
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid hsla(var(--border-glass));
+    background: hsla(var(--card-bg-glass));
+  }
+
+  /* Responsive styling */
+  @media (max-width: 900px) {
+    .catalog-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      max-width: 600px;
+    }
   }
 </style>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const cards = document.querySelectorAll('[data-tilt]');
+    
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
+        const x = (e as MouseEvent).clientX - rect.left;
+        const y = (e as MouseEvent).clientY - rect.top;
+        
+        // Update glow gradient center coordinates
+        (card as HTMLElement).style.setProperty('--mouse-x', `${(x / w) * 100}%`);
+        (card as HTMLElement).style.setProperty('--mouse-y', `${(y / h) * 100}%`);
+        
+        // Calculate 3D rotation angles
+        const rotateX = ((y / h) - 0.5) * -15;
+        const rotateY = ((x / w) - 0.5) * 15;
+        
+        (card as HTMLElement).style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+      
+      card.addEventListener('mouseleave', () => {
+        (card as HTMLElement).style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      });
+    });
+  });
+</script>
