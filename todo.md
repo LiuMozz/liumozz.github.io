@@ -14,10 +14,10 @@
   - **Commit ID**：`4973290`
 
 ## 🐛 缺陷修复
-- [ ] **旅行与游戏页面的视频播放失败 (403 错误)**
+- [x] **旅行与游戏页面的视频播放失败 (403 错误)**
   - **描述**：修复 [travel.astro](file:///d:/AntigravityWorkspace/self_blog/src/pages/travel.astro) 和 [gaming.astro](file:///d:/AntigravityWorkspace/self_blog/src/pages/gaming.astro) 中的 Mixkit 视频源被限制防盗链导致 403 的问题，使用稳定、开放的视频 CDN 替换。
-  - **完成标记**：`[ ]`
-  - **Commit ID**：-
+  - **完成标记**：`[x]`
+  - **Commit ID**：`85991ab`
 
 - [x] **音乐馆默认时长显示问题**
   - **描述**：优化 [MusicPlayer.astro](file:///d:/AntigravityWorkspace/self_blog/src/components/MusicPlayer.astro) 页面首次加载时默认显示 `0:00` 的问题，改为显示 `--:--`，并在音频数据加载完成后再更新。
