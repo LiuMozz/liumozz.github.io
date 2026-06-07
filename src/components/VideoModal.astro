@@ -9,7 +9,7 @@
     <!-- Video Player Container -->
     <div class="custom-video-player" id="video-player-container">
       <video class="modal-video-tag" id="modal-video-el" src=""></video>
-      <iframe class="modal-iframe-tag hidden" id="modal-iframe-el" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <iframe class="modal-iframe-tag hidden" id="modal-iframe-el" src="" frameborder="0" scrolling="no" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       
       <!-- Big Play Overlay Button -->
       <div class="video-big-play-btn" id="video-big-play">
@@ -147,6 +147,7 @@
     height: 100%;
     display: block;
     border: none;
+    overflow: hidden;
   }
 
   .video-big-play-btn {
