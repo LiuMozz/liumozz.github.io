@@ -28,4 +28,4 @@
 - [x] **支持抖音视频卡片嵌入与播放**
   - **描述**：解析抖音分享短链提取视频 ID，并在 [VideoCard.astro](file:///d:/AntigravityWorkspace/self_blog/src/components/VideoCard.astro) 和 [VideoModal.astro](file:///d:/AntigravityWorkspace/self_blog/src/components/VideoModal.astro) 中集成 iframe 嵌入引擎，隐藏自定义控制器，在旅行栏目新增“自驾青甘大环线”卡片并支持无缝弹窗播放。
   - **完成标记**：`[x]`
-  - **Commit ID**：`9043eaf`
+  - **Commit ID**：`9043eaf` & `49833cd`
