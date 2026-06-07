@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmic Galaxy Background</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #030308;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="galaxy-canvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('galaxy-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    // Listen to resize
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initStars();
+    });
+
+    // Configuration
+    const STAR_COUNT = Math.floor((width * height) / 5000); // adapt count to screen size
+    const stars = [];
+    const nebulae = [];
+    const shootingStars = [];
+
+    // Star Class
+    class Star {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.r = Math.random() * 1.2 + 0.3; // tiny stars
+        this.speed = Math.random() * 0.02 + 0.005; // twinkle speed
+        this.maxAlpha = Math.random() * 0.8 + 0.2;
+        this.phase = Math.random() * Math.PI * 2; // initial phase
+        // Color choice: mostly white, some blueish, some warm orange/yellow
+        const rand = Math.random();
+        if (rand > 0.85) {
+          this.color = `rgba(185, 230, 255, `; // cyan tint
+        } else if (rand > 0.75) {
+          this.color = `rgba(255, 220, 180, `; // orange tint
+        } else {
+          this.color = `rgba(255, 255, 255, `; // pure white
+        }
+      }
+
+      update() {
+        this.phase += this.speed;
+        if (this.phase > Math.PI * 2) {
+          this.phase -= Math.PI * 2;
+        }
+      }
+
+      draw() {
+        // Twinkle effect using Math.sin
+        const alpha = ((Math.sin(this.phase) + 1) / 2) * this.maxAlpha;
+        ctx.fillStyle = this.color + alpha + ')';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Nebula Class
+    class Nebula {
+      constructor(color, targetRadius) {
+        this.color = color; // e.g. '280, 100%, 60%' (purple) or '185, 100%, 50%' (cyan)
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.r = targetRadius;
+        this.angle = Math.random() * Math.PI * 2;
+        this.speed = Math.random() * 0.001 + 0.0002;
+        this.driftX = Math.random() * 100 - 50;
+        this.driftY = Math.random() * 100 - 50;
+      }
+
+      update() {
+        this.angle += this.speed;
+      }
+
+      draw() {
+        // Slow circular drift
+        const dx = this.x + Math.sin(this.angle) * this.driftX;
+        const dy = this.y + Math.cos(this.angle) * this.driftY;
+
+        const gradient = ctx.createRadialGradient(dx, dy, 0, dx, dy, this.r);
+        gradient.addColorStop(0, `hsla(${this.color}, 0.09)`);
+        gradient.addColorStop(0.5, `hsla(${this.color}, 0.03)`);
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(dx, dy, this.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Shooting Star Class
+    class ShootingStar {
+      constructor() {
+        this.active = false;
+      }
+
+      spawn() {
+        this.x = Math.random() * (width * 0.6);
+        this.y = Math.random() * (height * 0.4);
+        this.len = Math.random() * 80 + 40;
+        this.speed = Math.random() * 15 + 8;
+        this.angle = Math.PI / 6 + Math.random() * (Math.PI / 12); // around 30 degrees down-right
+        this.alpha = 1;
+        this.active = true;
+      }
+
+      update() {
+        if (!this.active) return;
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+        this.alpha -= 0.02;
+        if (this.alpha <= 0 || this.x > width || this.y > height) {
+          this.active = false;
+        }
+      }
+
+      draw() {
+        if (!this.active) return;
+        ctx.save();
+        ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha})`;
+        ctx.lineWidth = 1.5;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x - Math.cos(this.angle) * this.len, this.y - Math.sin(this.angle) * this.len);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // Initialize arrays
+    function initStars() {
+      stars.length = 0;
+      const adaptiveCount = Math.floor((width * height) / 5000);
+      for (let i = 0; i < adaptiveCount; i++) {
+        stars.push(new Star());
+      }
+    }
+
+    function initNebulae() {
+      nebulae.length = 0;
+      // 1 Cyan nebula, 1 Purple nebula, 1 Pink nebula
+      nebulae.push(new Nebula('185, 100%, 50%', Math.min(width, height) * 0.7)); // Cyan
+      nebulae.push(new Nebula('280, 100%, 60%', Math.min(width, height) * 0.8)); // Purple
+      nebulae.push(new Nebula('335, 100%, 60%', Math.min(width, height) * 0.6)); // Pink
+    }
+
+    // Setup arrays
+    initStars();
+    initNebulae();
+    for (let i = 0; i < 2; i++) {
+      shootingStars.push(new ShootingStar());
+    }
+
+    // Animation loop
+    function animate() {
+      // Clear screen with a very dark background
+      ctx.fillStyle = '#030308';
+      ctx.fillRect(0, 0, width, height);
+
+      // 1. Draw Nebulae
+      nebulae.forEach(nebula => {
+        nebula.update();
+        nebula.draw();
+      });
+
+      // 2. Draw Stars
+      stars.forEach(star => {
+        star.update();
+        star.draw();
+      });
+
+      // 3. Spawning & drawing shooting stars
+      shootingStars.forEach(ss => {
+        if (!ss.active && Math.random() < 0.0015) {
+          ss.spawn();
+        }
+        ss.update();
+        ss.draw();
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

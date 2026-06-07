@@ -49,6 +49,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://liumozz.
 		<ClientRouter />
 	</head>
 	<body>
+		<!-- Fullscreen Theme Background Iframe -->
+		<iframe id="theme-bg-iframe" class="theme-bg-iframe" src="" frameborder="0" allowtransparency="true" transition:persist></iframe>
+
 		<!-- Glowing Navigation Header -->
 		<header class="site-header glass">
 			<nav class="nav-container">
@@ -64,6 +67,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://liumozz.
 					<li><a href="/travel" class={Astro.url.pathname.startsWith('/travel') ? 'active' : ''}>旅行</a></li>
 					<li><a href="/archives" class={Astro.url.pathname.startsWith('/archives') ? 'active' : ''}>归档</a></li>
 					<li><a href="/search" class={Astro.url.pathname.startsWith('/search') ? 'active' : ''} id="nav-search-btn">🔍 搜索</a></li>
+					<li><button class="nav-theme-btn glass" id="nav-theme-btn" aria-label="切换主题">🌌 主题</button></li>
 				</ul>
 				<button class="mobile-nav-toggle" aria-label="Toggle Menu">
 					<span></span>
@@ -77,6 +81,28 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://liumozz.
 		<main class="main-content">
 			<slot />
 		</main>
+
+		<!-- Theme Switcher Floating Panel -->
+		<div class="theme-panel glass" id="theme-panel">
+			<h4 class="theme-panel-title">🎨 背景选择</h4>
+			<div class="theme-options">
+				<button class="theme-option-btn glass active" data-theme="default">
+					<span class="option-icon">⚫</span>
+					<span class="option-name">经典极暗</span>
+				</button>
+				<button class="theme-option-btn glass" data-theme="galaxy">
+					<span class="option-icon">🌌</span>
+					<span class="option-name">银河星空</span>
+				</button>
+			</div>
+			<div class="theme-opacity-control">
+				<div class="opacity-label-row">
+					<span>背景透明度</span>
+					<span id="theme-opacity-value">60%</span>
+				</div>
+				<input type="range" id="theme-opacity-slider" min="10" max="100" value="60" class="theme-opacity-slider" />
+			</div>
+		</div>
 
 		<!-- Glowing Footer -->
 		<footer class="site-footer glass">
@@ -105,6 +131,86 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://liumozz.
 						navLinks.classList.toggle('open');
 					});
 				}
+
+				// Theme Panel controls
+				const themeBtn = document.getElementById('nav-theme-btn');
+				const themePanel = document.getElementById('theme-panel');
+				const iframe = document.getElementById('theme-bg-iframe') as HTMLIFrameElement;
+				const opacitySlider = document.getElementById('theme-opacity-slider') as HTMLInputElement;
+				const opacityValue = document.getElementById('theme-opacity-value');
+				const optionBtns = document.querySelectorAll('.theme-option-btn');
+
+				if (themeBtn && themePanel) {
+					themeBtn.addEventListener('click', (e) => {
+						e.stopPropagation();
+						themePanel.classList.toggle('open');
+						themeBtn.classList.toggle('active');
+					});
+
+					// Close panel if clicked outside
+					document.addEventListener('click', (e) => {
+						if (!themePanel.contains(e.target as Node) && e.target !== themeBtn) {
+							themePanel.classList.remove('open');
+							themeBtn.classList.remove('active');
+						}
+					});
+				}
+
+				// Apply stored settings
+				let storedTheme = localStorage.getItem('blog-theme') || 'default';
+				let storedOpacity = localStorage.getItem('blog-theme-opacity') || '60';
+
+				function applyTheme(themeName: string, opacityPercent: string) {
+					if (iframe) {
+						if (themeName === 'galaxy') {
+							// If already loaded galaxy, don't reload src to avoid reset
+							const currentSrc = iframe.getAttribute('src');
+							if (!currentSrc || !currentSrc.includes('/themes/galaxy.html')) {
+								iframe.src = '/themes/galaxy.html';
+							}
+						} else {
+							iframe.src = 'about:blank'; // Empty/Default dark background
+						}
+						iframe.style.opacity = (parseFloat(opacityPercent) / 100).toString();
+					}
+
+					// Update UI Panel Buttons
+					optionBtns.forEach(btn => {
+						const name = btn.getAttribute('data-theme');
+						if (name === themeName) {
+							btn.classList.add('active');
+						} else {
+							btn.classList.remove('active');
+						}
+					});
+
+					// Update UI slider
+					if (opacitySlider) opacitySlider.value = opacityPercent;
+					if (opacityValue) opacityValue.innerText = `${opacityPercent}%`;
+				}
+
+				// Initial run on page load
+				applyTheme(storedTheme, storedOpacity);
+
+				// Bind option buttons click
+				optionBtns.forEach(btn => {
+					btn.addEventListener('click', () => {
+						const selected = btn.getAttribute('data-theme') || 'default';
+						storedTheme = selected;
+						localStorage.setItem('blog-theme', selected);
+						applyTheme(storedTheme, storedOpacity);
+					});
+				});
+
+				// Bind opacity slider input
+				if (opacitySlider) {
+					opacitySlider.addEventListener('input', () => {
+						const val = opacitySlider.value;
+						storedOpacity = val;
+						localStorage.setItem('blog-theme-opacity', val);
+						applyTheme(storedTheme, storedOpacity);
+					});
+				}
 			});
 
 			// Glow card mouse tracker
@@ -123,6 +229,144 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://liumozz.
 </html>
 
 <style>
+	/* Theme Background Iframe */
+	.theme-bg-iframe {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		border: none;
+		z-index: -2; /* behind grid backgrounds */
+		pointer-events: none;
+		background: transparent;
+		opacity: 0.6;
+		transition: opacity 0.5s ease;
+	}
+
+	/* Theme Toggle Nav Button */
+	.nav-theme-btn {
+		background: hsla(var(--neon-cyan), 0.1);
+		border-color: hsla(var(--neon-cyan), 0.2);
+		color: hsl(var(--text-primary));
+		font-weight: 500;
+		font-size: 0.95rem;
+		padding: 0.5rem 1rem;
+		border-radius: var(--radius-sm);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		transition: var(--transition-smooth);
+	}
+
+	.nav-theme-btn:hover, .nav-theme-btn.active {
+		color: #ffffff;
+		background: hsla(var(--neon-cyan), 0.2);
+		border-color: hsla(var(--neon-cyan), 0.5);
+		box-shadow: 0 0 15px -3px hsla(var(--neon-cyan), 0.4);
+		text-shadow: 0 0 5px hsla(var(--neon-cyan), 0.5);
+	}
+
+	/* Theme Settings Floating Panel */
+	.theme-panel {
+		position: fixed;
+		top: 90px;
+		right: 5%;
+		width: 260px;
+		padding: 1.2rem;
+		z-index: 1000;
+		border-color: hsla(var(--border-glass));
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+		transform: translateY(-10px);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.3s ease, transform 0.3s ease;
+	}
+
+	.theme-panel.open {
+		opacity: 1;
+		transform: translateY(0);
+		pointer-events: auto;
+	}
+
+	.theme-panel-title {
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: #ffffff;
+		border-bottom: 1px solid hsla(var(--border-glass));
+		padding-bottom: 0.4rem;
+	}
+
+	.theme-options {
+		display: flex;
+		flex-direction: column;
+		gap: 0.6rem;
+	}
+
+	.theme-option-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.8rem;
+		padding: 0.5rem 1rem;
+		width: 100%;
+		border-radius: var(--radius-sm);
+		border: 1px solid transparent;
+		background: rgba(255, 255, 255, 0.02);
+		color: hsl(var(--text-secondary));
+		cursor: pointer;
+		text-align: left;
+		transition: var(--transition-smooth);
+	}
+
+	.theme-option-btn:hover {
+		background: rgba(255, 255, 255, 0.06);
+		border-color: hsla(var(--border-glass));
+		color: #ffffff;
+	}
+
+	.theme-option-btn.active {
+		border-color: hsl(var(--neon-cyan));
+		background: hsla(var(--neon-cyan), 0.1);
+		color: hsl(var(--neon-cyan));
+		box-shadow: 0 0 10px hsla(var(--neon-cyan), 0.2);
+	}
+
+	.theme-opacity-control {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.opacity-label-row {
+		display: flex;
+		justify-content: space-between;
+		font-size: 0.8rem;
+		color: hsl(var(--text-muted));
+	}
+
+	.theme-opacity-slider {
+		-webkit-appearance: none;
+		background: rgba(255, 255, 255, 0.1);
+		height: 4px;
+		border-radius: 2px;
+		outline: none;
+		cursor: pointer;
+		width: 100%;
+	}
+
+	.theme-opacity-slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: hsl(var(--neon-cyan));
+		box-shadow: 0 0 5px hsl(var(--neon-cyan));
+	}
+
 	/* Header Navigation */
 	.site-header {
 		position: sticky;
