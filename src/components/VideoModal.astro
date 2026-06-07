@@ -9,6 +9,7 @@
     <!-- Video Player Container -->
     <div class="custom-video-player" id="video-player-container">
       <video class="modal-video-tag" id="modal-video-el" src=""></video>
+      <iframe class="modal-iframe-tag hidden" id="modal-iframe-el" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       
       <!-- Big Play Overlay Button -->
       <div class="video-big-play-btn" id="video-big-play">
@@ -139,6 +140,13 @@
     height: 100%;
     display: block;
     object-fit: contain;
+  }
+
+  .modal-iframe-tag {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: none;
   }
 
   .video-big-play-btn {
@@ -302,6 +310,7 @@
     // Bind Video Modal control triggers
     const modal = document.getElementById('video-modal');
     const modalVideo = document.getElementById('modal-video-el') as HTMLVideoElement;
+    const modalIframe = document.getElementById('modal-iframe-el') as HTMLIFrameElement;
     const modalTitle = document.getElementById('modal-title-el');
     const modalDesc = document.getElementById('modal-desc-el');
     const modalClose = document.getElementById('modal-close');
@@ -320,6 +329,7 @@
     const volumeSlider = document.getElementById('video-volume') as HTMLInputElement;
     const fullscreenBtn = document.getElementById('video-fullscreen-btn');
     const playerContainer = document.getElementById('video-player-container');
+    const controlsBar = document.querySelector('.video-controls-bar');
 
     // Trigger modal open from Video Cards
     const cards = document.querySelectorAll('[data-video-url]');
@@ -329,24 +339,49 @@
         const title = card.getAttribute('data-video-title') || '';
         const desc = card.getAttribute('data-video-desc') || '';
 
-        if (modal && modalVideo) {
-          modalVideo.src = videoUrl;
+        if (modal) {
           if (modalTitle) modalTitle.innerText = title;
           if (modalDesc) modalDesc.innerText = desc;
           
           modal.classList.add('open');
           
-          // Auto play inside modal
-          setTimeout(() => {
-            modalVideo.play().then(() => {
-              playIcon?.classList.add('hidden');
-              pauseIcon?.classList.remove('hidden');
-              bigPlayBtn?.classList.add('hidden');
-            }).catch(err => {
-              console.log("Autoplay on modal blocked, show big button:", err);
-              bigPlayBtn?.classList.remove('hidden');
-            });
-          }, 100);
+          const isEmbed = !videoUrl.endsWith('.mp4') && !videoUrl.includes('.mp4');
+          
+          if (isEmbed) {
+            if (modalVideo) {
+              modalVideo.classList.add('hidden');
+              modalVideo.pause();
+              modalVideo.src = '';
+            }
+            if (modalIframe) {
+              modalIframe.classList.remove('hidden');
+              modalIframe.src = videoUrl;
+            }
+            if (bigPlayBtn) bigPlayBtn.classList.add('hidden');
+            if (controlsBar) controlsBar.classList.add('hidden');
+          } else {
+            if (modalIframe) {
+              modalIframe.classList.add('hidden');
+              modalIframe.src = '';
+            }
+            if (modalVideo) {
+              modalVideo.classList.remove('hidden');
+              modalVideo.src = videoUrl;
+              
+              // Auto play inside modal
+              setTimeout(() => {
+                modalVideo.play().then(() => {
+                  playIcon?.classList.add('hidden');
+                  pauseIcon?.classList.remove('hidden');
+                  bigPlayBtn?.classList.add('hidden');
+                }).catch(err => {
+                  console.log("Autoplay on modal blocked, show big button:", err);
+                  bigPlayBtn?.classList.remove('hidden');
+                });
+              }, 100);
+            }
+            if (controlsBar) controlsBar.classList.remove('hidden');
+          }
         }
       });
     });
@@ -358,6 +393,9 @@
         if (modalVideo) {
           modalVideo.pause();
           modalVideo.src = ''; // Clear source to stop buffering
+        }
+        if (modalIframe) {
+          modalIframe.src = ''; // Clear source to stop playback
         }
       }
     }

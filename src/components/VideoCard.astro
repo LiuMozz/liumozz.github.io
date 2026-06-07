@@ -9,6 +9,8 @@ interface Props {
 }
 
 const { title, description, videoUrl, thumbnailUrl, tag = '精彩瞬间', accent = 'cyan' } = Astro.props;
+
+const isEmbed = !videoUrl.endsWith('.mp4') && !videoUrl.includes('.mp4');
 ---
 
 <div 
@@ -21,15 +23,17 @@ const { title, description, videoUrl, thumbnailUrl, tag = '精彩瞬间', accent
     <!-- Static Thumbnail -->
     <img src={thumbnailUrl} alt={title} class="video-thumbnail" />
     
-    <!-- Silent Preview Video -->
-    <video 
-      src={videoUrl} 
-      class="video-preview-tag" 
-      muted 
-      loop 
-      playsinline 
-      preload="none"
-    ></video>
+    <!-- Silent Preview Video (only for direct mp4 streams) -->
+    {!isEmbed && (
+      <video 
+        src={videoUrl} 
+        class="video-preview-tag" 
+        muted 
+        loop 
+        playsinline 
+        preload="none"
+      ></video>
+    )}
     
     <!-- Hover Play Overlay -->
     <div class="hover-play-overlay">
