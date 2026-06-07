@@ -8,13 +8,18 @@
   - **完成标记**：`[x]`
   - **Commit ID**：`74402d7`
 
+- [x] **动态背景主题切换与“银河星空”动画**
+  - **描述**：在 Layout 中集成 Iframe 背景引擎，新增导航栏“主题”控制面板与透明度滑块，并基于 Canvas 编写黑色基底的动态银河星空背景网页。
+  - **完成标记**：`[x]`
+  - **Commit ID**：`4973290`
+
 ## 🐛 缺陷修复
 - [ ] **旅行与游戏页面的视频播放失败 (403 错误)**
   - **描述**：修复 [travel.astro](file:///d:/AntigravityWorkspace/self_blog/src/pages/travel.astro) 和 [gaming.astro](file:///d:/AntigravityWorkspace/self_blog/src/pages/gaming.astro) 中的 Mixkit 视频源被限制防盗链导致 403 的问题，使用稳定、开放的视频 CDN 替换。
   - **完成标记**：`[ ]`
   - **Commit ID**：-
 
-- [ ] **音乐馆默认时长显示问题**
+- [x] **音乐馆默认时长显示问题**
   - **描述**：优化 [MusicPlayer.astro](file:///d:/AntigravityWorkspace/self_blog/src/components/MusicPlayer.astro) 页面首次加载时默认显示 `0:00` 的问题，改为显示 `--:--`，并在音频数据加载完成后再更新。
-  - **完成标记**：`[ ]`
-  - **Commit ID**：-
+  - **完成标记**：`[x]`
+  - **Commit ID**：`74402d7`
