@@ -5,9 +5,10 @@ interface Props {
   href: string;
   accent: 'cyan' | 'purple' | 'emerald' | 'orange' | 'pink';
   class?: string;
+  asDiv?: boolean;
 }
 
-const { title, subtitle, href, accent, class: className = '' } = Astro.props;
+const { title, subtitle, href, accent, class: className = '', asDiv = false } = Astro.props;
 
 const accentColors = {
   cyan: 'hsla(var(--neon-cyan), 0.3)',
@@ -22,23 +23,39 @@ const textAccentClasses = {
   purple: 'text-gradient-purple',
   emerald: 'text-gradient-emerald',
   orange: 'text-gradient-orange',
-  pink: 'text-gradient-purple'
+  pink: 'text-gradient-pink'
 };
 ---
 
-<a href={href} class={`bento-card glass glow-card accent-${accent} ${className}`} data-tilt>
-  <div class="card-glow" style={`--accent-color: ${accentColors[accent]}`}></div>
-  <div class="card-content">
-    <div class="card-header">
-      <span class={`card-title ${textAccentClasses[accent]}`}>{title}</span>
-      <span class="card-arrow">→</span>
-    </div>
-    <p class="card-subtitle">{subtitle}</p>
-    <div class="card-slot">
-      <slot />
+{asDiv ? (
+  <div class={`bento-card glass glow-card accent-${accent} ${className}`} data-tilt data-href={href}>
+    <div class="card-glow" style={`--accent-color: ${accentColors[accent]}`}></div>
+    <div class="card-content">
+      <div class="card-header">
+        <span class={`card-title ${textAccentClasses[accent]}`}>{title}</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <p class="card-subtitle">{subtitle}</p>
+      <div class="card-slot">
+        <slot />
+      </div>
     </div>
   </div>
-</a>
+) : (
+  <a href={href} class={`bento-card glass glow-card accent-${accent} ${className}`} data-tilt>
+    <div class="card-glow" style={`--accent-color: ${accentColors[accent]}`}></div>
+    <div class="card-content">
+      <div class="card-header">
+        <span class={`card-title ${textAccentClasses[accent]}`}>{title}</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <p class="card-subtitle">{subtitle}</p>
+      <div class="card-slot">
+        <slot />
+      </div>
+    </div>
+  </a>
+)}
 
 <style>
   .bento-card {
@@ -149,11 +166,26 @@ const textAccentClasses = {
 </style>
 
 <script>
+  import { navigate } from 'astro:transitions/client';
+
   // Dynamic 3D tilt script
   document.addEventListener('astro:page-load', () => {
     const cards = document.querySelectorAll('[data-tilt]');
     
     cards.forEach(card => {
+      // Handle click navigation if it's a div
+      if (card.tagName.toLowerCase() === 'div') {
+        card.addEventListener('click', (e) => {
+          if (!(e.target as HTMLElement).closest('a, button')) {
+            const href = card.getAttribute('data-href');
+            if (href) {
+              navigate(href);
+            }
+          }
+        });
+        (card as HTMLElement).style.cursor = 'pointer';
+      }
+
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
         const w = rect.width;

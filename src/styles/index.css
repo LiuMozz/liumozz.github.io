@@ -116,6 +116,12 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-text-fill-color: transparent;
 }
 
+.text-gradient-pink {
+  background: linear-gradient(135deg, hsl(var(--neon-pink)) 0%, hsl(var(--neon-purple)) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 /* Custom interactive utility classes */
 .glow-card {
   position: relative;
