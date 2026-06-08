@@ -38,6 +38,11 @@
   - **完成标记**：`[x]`
   - **Commit ID**：`83a8c7f`
 
+- [x] **卡片悬停动效与光晕/阴影分主题设计**
+  - **描述**：在深色主题（Classic & Galaxy）下，针对有 3D 旋转及放大交互的 Bento 卡片和 Blog 分类卡片，悬停时新增外围边框颜色光晕（Halo/Glow）；在浅色主题（Light Mode）下，屏蔽霓虹光晕，改用与博客文章项类似的物理凸起立体阴影（Raised Shadow），使卡片在暖奶油底色上凸显微光浮雕效果。
+  - **完成标记**：`[x]`
+  - **Commit ID**：`01171fb`
+
 ## 🐛 缺陷修复
 - [x] **旅行与游戏页面的视频播放失败 (403 错误)**
   - **描述**：修复 [travel.astro](file:///d:/AntigravityWorkspace/self_blog/src/pages/travel.astro) 和 [gaming.astro](file:///d:/AntigravityWorkspace/self_blog/src/pages/gaming.astro) 中的 Mixkit 视频源被限制防盗链导致 403 的问题，使用稳定、开放的视频 CDN 替换。
