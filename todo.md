@@ -48,6 +48,10 @@
   - **完成标记**：`[x]`
   - **Commit ID**：`ffab4e2`
 
+- [x] **首页新增「✨ 最近更新」Bento 卡片**
+  - **描述**：在首页 Bento Grid 游戏子栏下方新增全宽「最近更新」卡片，主题色为玫瑰粉（`accent-pink`），区别于其他栏目（青/紫/绿/橙）；服务端通过 `getCollection('posts')` 按日期降序取前 3 条文章，列表项可直接点击跳转对应文章；卡片整体点击跳转归档页（`/archives`）。为 `BentoCard` 新增 `asDiv` 渲染模式，防止内层 `<a>` 嵌套于外层 `<a>` 产生非法 HTML；新增全局 `.text-gradient-pink` 工具类与 `.card-updates` 响应式栅格样式。
+  - **完成标记**：`[x]`
+  - **Commit ID**：`1059b7a`
 
 ## 🐛 缺陷修复
 - [x] **旅行与游戏页面的视频播放失败 (403 错误)**
@@ -65,3 +69,9 @@
   - **描述**：解析抖音分享短链提取视频 ID，并在 [VideoCard.astro](file:///d:/AntigravityWorkspace/self_blog/src/components/VideoCard.astro) 和 [VideoModal.astro](file:///d:/AntigravityWorkspace/self_blog/src/components/VideoModal.astro) 中集成 iframe 嵌入引擎，隐藏自定义控制器，在旅行栏目新增“自驾青甘大环线”卡片并支持无缝弹窗播放。
   - **完成标记**：`[x]`
   - **Commit ID**：`9043eaf` & `49833cd`
+
+## 📝 内容更新
+- [x] **Java刷题总结文章日期修正**
+  - **描述**：将 [java-algorithms-summary.md](file:///d:/AntigravityWorkspace/self_blog/src/content/posts/java-algorithms-summary.md) 的 frontmatter `date` 字段从 `2026-06-07` 更正为 `2022-06-07`，还原内容的实际创作年份，使归档时序正确。
+  - **完成标记**：`[x]`
+  - **Commit ID**：`d130711`
