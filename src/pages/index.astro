@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import AvatarBio from '../components/AvatarBio.astro';
 import BentoGrid from '../components/BentoGrid.astro';
+import BeijingClock from '../components/BeijingClock.astro';
 ---
 
 <Layout 
@@ -9,6 +10,11 @@ import BentoGrid from '../components/BentoGrid.astro';
   description="欢迎来到猛男妙妙屋！这里记录我的开发日常、技术学习笔记以及对生活的思考。"
 >
   <div class="home-container">
+    <!-- Clock display on top-right -->
+    <div class="clock-row">
+      <BeijingClock />
+    </div>
+
     <!-- Biography / Profile Section -->
     <section class="profile-section">
       <AvatarBio />
@@ -29,6 +35,12 @@ import BentoGrid from '../components/BentoGrid.astro';
     padding: 1rem 0;
   }
 
+  .clock-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: -0.8rem;
+  }
+
   .profile-section {
     width: 100%;
     margin-bottom: 0.5rem;
@@ -36,5 +48,12 @@ import BentoGrid from '../components/BentoGrid.astro';
 
   .modules-section {
     width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .clock-row {
+      justify-content: center;
+      margin-bottom: -0.4rem;
+    }
   }
 </style>

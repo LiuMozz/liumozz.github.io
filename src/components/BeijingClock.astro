@@ -1,0 +1,103 @@
+---
+---
+<div class="clock-text-only" id="bj-time">
+  载入中...
+</div>
+
+<script>
+  function updateBeijingTime() {
+    const timeElement = document.getElementById('bj-time');
+    if (!timeElement) return;
+
+    const now = new Date();
+    
+    // Create formatter for Asia/Shanghai (Beijing Time)
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Shanghai',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    };
+
+    try {
+      const formatter = new Intl.DateTimeFormat('zh-CN', options);
+      const parts = formatter.formatToParts(now);
+      
+      let year = '', month = '', day = '', hour = '', minute = '', second = '';
+      for (const part of parts) {
+        if (part.type === 'year') year = part.value;
+        if (part.type === 'month') month = part.value;
+        if (part.type === 'day') day = part.value;
+        if (part.type === 'hour') hour = part.value;
+        if (part.type === 'minute') minute = part.value;
+        if (part.type === 'second') second = part.value;
+      }
+      
+      // Get day of week in English (short abbreviation like "Mon")
+      const dayOfWeekOptions: Intl.DateTimeFormatOptions = {
+        timeZone: 'Asia/Shanghai',
+        weekday: 'short'
+      };
+      const weekdayStr = new Intl.DateTimeFormat('en-US', dayOfWeekOptions).format(now);
+      
+      timeElement.textContent = `${year}-${month}-${day} ${weekdayStr} ${hour}:${minute}:${second}`;
+    } catch (e) {
+      // Fallback in case of error
+      timeElement.textContent = now.toLocaleString();
+    }
+  }
+
+  let timeInterval: any = null;
+
+  function startClock() {
+    updateBeijingTime();
+    if (timeInterval) clearInterval(timeInterval);
+    timeInterval = setInterval(updateBeijingTime, 1000);
+  }
+
+  // Handle Astro page transitions (ClientRouter)
+  document.addEventListener('astro:page-load', () => {
+    const timeElement = document.getElementById('bj-time');
+    if (timeElement) {
+      startClock();
+    } else {
+      if (timeInterval) {
+        clearInterval(timeInterval);
+        timeInterval = null;
+      }
+    }
+  });
+</script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  .clock-text-only {
+    font-family: 'Share Tech Mono', 'Outfit', monospace;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: hsl(var(--text-secondary));
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+    transition: var(--transition-smooth);
+    user-select: none;
+    text-shadow: 0 0 8px hsla(var(--neon-cyan), 0.2);
+    display: inline-block;
+  }
+
+  .clock-text-only:hover {
+    color: hsl(var(--neon-cyan));
+    text-shadow: 0 0 12px hsla(var(--neon-cyan), 0.6);
+  }
+
+  /* Responsive styling */
+  @media (max-width: 768px) {
+    .clock-text-only {
+      font-size: 0.95rem;
+    }
+  }
+</style>
