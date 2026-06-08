@@ -711,7 +711,22 @@ html[data-theme="light"] input[type="range"] {
 /* Bento Cards and Category Cards Hover Effects for Dark and Light Themes */
 .bento-card:hover, .category-card:hover {
   border-color: var(--accent-border) !important;
-  box-shadow: 0 0 20px 2px var(--accent-border), 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.bento-card.accent-cyan:hover, .category-card.accent-cyan:hover {
+  box-shadow: 0 12px 32px hsl(var(--neon-cyan) / 0.35), 0 4px 12px hsl(var(--neon-cyan) / 0.15) !important;
+}
+.bento-card.accent-purple:hover, .category-card.accent-purple:hover {
+  box-shadow: 0 12px 32px hsl(var(--neon-purple) / 0.35), 0 4px 12px hsl(var(--neon-purple) / 0.15) !important;
+}
+.bento-card.accent-emerald:hover, .category-card.accent-emerald:hover {
+  box-shadow: 0 12px 32px hsl(var(--neon-emerald) / 0.35), 0 4px 12px hsl(var(--neon-emerald) / 0.15) !important;
+}
+.bento-card.accent-orange:hover, .category-card.accent-orange:hover {
+  box-shadow: 0 12px 32px hsl(var(--neon-orange) / 0.35), 0 4px 12px hsl(var(--neon-orange) / 0.15) !important;
+}
+.bento-card.accent-pink:hover, .category-card.accent-pink:hover {
+  box-shadow: 0 12px 32px hsl(var(--neon-pink) / 0.35), 0 4px 12px hsl(var(--neon-pink) / 0.15) !important;
 }
 
 html[data-theme="light"] .bento-card:hover,
