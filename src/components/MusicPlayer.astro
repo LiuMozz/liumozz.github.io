@@ -336,8 +336,11 @@ const originalSongs = songs.filter(s => s.type === 'original');
     overflow-y: hidden;
     position: relative;
     margin-bottom: 1.2rem;
-    border-top: 1px solid hsla(var(--border-glass));
-    border-bottom: 1px solid hsla(var(--border-glass));
+    border-top: 1px solid hsla(var(--neon-purple), 0.25);
+    border-bottom: 1px solid hsla(var(--neon-purple), 0.25);
+    box-shadow: 
+      inset 0 20px 20px -20px hsla(var(--neon-purple), 0.45),
+      inset 0 -20px 20px -20px hsla(var(--neon-purple), 0.45);
     padding: 1rem 0;
   }
 
@@ -376,14 +379,23 @@ const originalSongs = songs.filter(s => s.type === 'original');
     transition: var(--transition-smooth);
     width: 100%;
     opacity: 0.35;
+    padding: 0.2rem 2rem;
+    border-radius: 12px;
+    background: transparent;
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
   }
 
   .lyric-line.active {
     color: hsl(var(--neon-purple));
-    font-weight: 600;
-    font-size: 1.1rem;
-    text-shadow: 0 0 10px hsla(var(--neon-purple), 0.4);
+    font-weight: 800;
+    font-size: 1.15rem;
+    text-shadow: 0 0 12px hsla(var(--neon-purple), 0.6);
     opacity: 1;
+    background: linear-gradient(90deg, transparent 0%, hsla(var(--neon-purple), 0.15) 20%, hsla(var(--neon-purple), 0.25) 50%, hsla(var(--neon-purple), 0.15) 80%, transparent 100%);
+    border-left: 2px solid hsla(var(--neon-purple), 0.4);
+    border-right: 2px solid hsla(var(--neon-purple), 0.4);
+    box-shadow: 0 0 15px hsla(var(--neon-purple), 0.15);
   }
 
   /* Controls layout */
